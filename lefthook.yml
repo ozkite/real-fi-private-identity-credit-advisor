@@ -1,0 +1,12 @@
+pre-commit:
+  jobs:
+    - name: biome-format
+      run: pnpm format "{staged_files}"
+      stage_fixed: true
+
+pre-push:
+  jobs:
+    - name: biome-check
+      run: pnpm lint "{push_files}"
+    - name: tsc-check
+      run: pnpm exec tsc
