@@ -1,7 +1,12 @@
 pre-commit:
   jobs:
     - name: biome-format
-      run: pnpm format "{staged_files}"
+      run: |
+        # Filter staged files to only include files that Biome can process
+        biome_files=$(echo "{staged_files}" | tr ' ' '\n' | grep -E '\.(ts|js|tsx|mjs|json)$' | tr '\n' ' ')
+        if [ -n "$biome_files" ]; then
+          pnpm format $biome_files
+        fi
       stage_fixed: true
 
 pre-push:
