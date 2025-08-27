@@ -3,7 +3,6 @@
 import "@/app/globals.css";
 import { useState } from "react";
 import AuthModal from "@/components/auth/AuthModal";
-import PersonaSelector from "@/components/chat/PersonaSelector";
 import Sidebar from "@/components/chat/Sidebar";
 import SidebarIcon from "@/components/chat/SidebarIcon";
 import SignInButton from "@/components/chat/SignInButton";
@@ -17,12 +16,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const [authMode, setAuthMode] = useState<"signin" | "signup" | null>(null);
   const { user, signOut } = useAuth();
 
-  const { isSidebarCollapsed, toggleSidebar, setSelectedPersona, hasMessages } =
-    useApp();
-
-  const handlePersonaChange = (personaId: string) => {
-    setSelectedPersona(personaId);
-  };
+  const { isSidebarCollapsed, toggleSidebar } = useApp();
 
   return (
     <div className="flex bg-[#F7F6F2] h-screen overflow-hidden">
@@ -42,10 +36,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
             <SidebarIcon
               isCollapsed={isSidebarCollapsed}
               onClick={toggleSidebar}
-            />
-            <PersonaSelector
-              onPersonaChange={handlePersonaChange}
-              disabled={hasMessages}
             />
           </div>
 
