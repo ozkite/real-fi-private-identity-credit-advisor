@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "pnpm exec biome check --write --unsafe",
     "format": "pnpm exec biome format --write",
-    "postinstall": "lefthook install"
+    "postinstall": "sh -lc 'command -v git >/dev/null 2>&1 && [ -d .git ] && lefthook install || echo \"Skipping lefthook (no git or .git)\"'"
   },
   "dependencies": {
     "@nillion/blindfold": "0.1.0",
