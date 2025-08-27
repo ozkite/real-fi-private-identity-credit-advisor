@@ -50,14 +50,19 @@ const AttestationModal = () => {
           <Accordion type="single" collapsible className="mb-4">
             <AccordionItem value="instructions-a" className="border-0">
               <AccordionTrigger className="p-0 hover:no-underline justify-start gap-2">
-                <span className="text-sm text-gray-600">Show instructions</span>
+                <span className="text-sm text-gray-600">DIY Instructions</span>
               </AccordionTrigger>
               <AccordionContent className="p-0 mt-1">
                 <p className="text-xs text-gray-600">
                   You can do this yourself by making a POST request to{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono break-all">
+                  <a
+                    href="https://nilgpt.xyz/nilcc/api/v1/report/generate"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
                     https://nilgpt.xyz/nilcc/api/v1/report/generate
-                  </code>{" "}
+                  </a>{" "}
                   with body:{" "}
                   <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono break-all">
                     {"{nonce: 64hex}"}
@@ -90,7 +95,7 @@ const AttestationModal = () => {
               {measurementHash && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
-                    Result:
+                    Measurement Hash:
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -138,26 +143,41 @@ const AttestationModal = () => {
           <Accordion type="single" collapsible className="mb-4">
             <AccordionItem value="instructions-b" className="border-0">
               <AccordionTrigger className="p-0 hover:no-underline justify-start gap-2">
-                <span className="text-sm text-gray-600">Show instructions</span>
+                <span className="text-sm text-gray-600">DIY Instructions</span>
               </AccordionTrigger>
               <AccordionContent className="p-0 mt-1">
                 <p className="text-xs text-gray-600">
                   To check this yourself, simply reference{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono break-all">
+                  <a
+                    href={LINKS.MEASUREMENT_HASH_INDEX}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
                     {LINKS.MEASUREMENT_HASH_INDEX}
-                  </code>{" "}
+                  </a>{" "}
                   against the current nilGPT version from{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono break-all">
+                  <a
+                    href="https://nilgpt.xyz/api/version"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
                     https://nilgpt.xyz/api/version
-                  </code>
+                  </a>
                   .
                 </p>
                 <p className="text-xs text-gray-600 mt-1">
                   Alternatively, you can generate the measurement hash yourself
                   by running this script{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono break-all">
+                  <a
+                    href={LINKS.MEASUREMENT_HASH_GENERATION_SCRIPT}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
                     {LINKS.MEASUREMENT_HASH_GENERATION_SCRIPT}
-                  </code>
+                  </a>
                   .
                 </p>
               </AccordionContent>

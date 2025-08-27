@@ -6,8 +6,7 @@ export interface Persona {
   model: string;
 }
 
-export const DEFAULT_MODEL =
-  "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4";
+export const DEFAULT_MODEL = "meta-llama/Llama-3.2-3B-Instruct";
 
 export const personas: Persona[] = [
   {

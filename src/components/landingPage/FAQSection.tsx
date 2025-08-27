@@ -44,7 +44,7 @@ const FAQSection = () => {
     {
       question: "What AI models are used in nilGPT?",
       answer:
-        "Currently the Llama-3.1-70B-Instruct-AWQ-INT4 model is used in nilGPT, however we are continuously evaluating which models provide the best accuracy and latency.",
+        "Currently the Llama-3.2-3B-Instruct model is used in nilGPT, however we are continuously evaluating which models provide the best accuracy and latency.",
     },
     {
       question: "Is my data used to train the models?",
