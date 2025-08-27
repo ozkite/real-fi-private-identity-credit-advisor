@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "pnpm exec biome check --write --unsafe",
-    "format": "pnpm exec biome format --write --files-ignore-unknown=true",
+    "format": "pnpm exec biome format --write",
     "postinstall": "lefthook install"
   },
   "dependencies": {
