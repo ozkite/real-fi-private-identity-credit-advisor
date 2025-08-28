@@ -8,7 +8,8 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function ContentPolicy() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpandedFirst, setIsExpandedFirst] = useState(false);
+  const [isExpandedSecond, setIsExpandedSecond] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -76,7 +77,7 @@ export default function ContentPolicy() {
 
                 {/* Expandable Content */}
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? "max-h-none" : "max-h-0"}`}
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpandedFirst ? "max-h-none" : "max-h-0"}`}
                 >
                   <p className="text-navy-700 leading-relaxed mb-4">
                     Still, claiming privacy on its own isn't enough. Anybody can
@@ -285,10 +286,10 @@ export default function ContentPolicy() {
                 {/* Toggle Button */}
                 <div className="text-center mt-6">
                   <button
-                    onClick={() => setIsExpanded(!isExpanded)}
+                    onClick={() => setIsExpandedFirst(!isExpandedFirst)}
                     className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
                   >
-                    {isExpanded ? "Show Less" : "Read More"}
+                    {isExpandedFirst ? "Show Less" : "Read More"}
                   </button>
                 </div>
               </article>
@@ -324,7 +325,7 @@ export default function ContentPolicy() {
 
                 {/* Expandable Content - All remaining content */}
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? "max-h-none" : "max-h-0"}`}
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpandedSecond ? "max-h-none" : "max-h-0"}`}
                 >
                   {/* Remaining paragraphs from first section */}
                   <section className="mb-8">
@@ -780,10 +781,10 @@ export default function ContentPolicy() {
                 {/* Toggle Button */}
                 <div className="text-center mt-6">
                   <button
-                    onClick={() => setIsExpanded(!isExpanded)}
+                    onClick={() => setIsExpandedSecond(!isExpandedSecond)}
                     className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
                   >
-                    {isExpanded ? "Show Less" : "Read More"}
+                    {isExpandedSecond ? "Show Less" : "Read More"}
                   </button>
                 </div>
               </article>
