@@ -1,5 +1,3 @@
-// app/layout.tsx
-
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
@@ -9,6 +7,7 @@ export const metadata: Metadata = {
   description:
     "nilGPT gives you all the functionality and all the privacy. Your totally secure AI workflow.",
   metadataBase: new URL("https://nilgpt.xyz"),
+  manifest: "/manifest.json",
   openGraph: {
     title: "nilGPT - Private LLM Chat",
     description:
