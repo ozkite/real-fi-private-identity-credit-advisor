@@ -8,7 +8,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function ContentPolicy() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpandedFirst, setIsExpandedFirst] = useState(false);
+  const [isExpandedSecond, setIsExpandedSecond] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -42,13 +43,270 @@ export default function ContentPolicy() {
           </div>
 
           {/* Content */}
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none space-y-8">
+            {/* First Article - New Post */}
+            <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
+              <article className="space-y-8">
+                {/* Main Title */}
+                <h1 className="font-display font-black text-3xl lg:text-4xl text-navy-900 mb-6">
+                  nilGPT: Towards Verifiable Trust
+                </h1>
+
+                {/* Date */}
+                <div className="text-navy-600 text-sm font-medium mb-8">
+                  August 28, 2025
+                </div>
+
+                {/* Introduction */}
+                <p className="text-navy-700 leading-relaxed mb-6">
+                  <em>
+                    TL;DR: nilGPT is now open source and comes with
+                    attestations. This means you can now verify the code running
+                    matches the published repository.
+                  </em>
+                </p>
+
+                <p className="text-navy-700 leading-relaxed mb-4">
+                  Two weeks ago we launched the first version of nilGPT with a
+                  clear mission: to give people a truly private option when
+                  using AI chatbots. This is important as most AI services today
+                  are not private by design—users are handing over their
+                  sensitive data and thoughts with no guarantees about how that
+                  information will be used or who may see it in the future.
+                </p>
+
+                {/* Expandable Content */}
+                <div
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpandedFirst ? "max-h-none" : "max-h-0"}`}
+                >
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    Still, claiming privacy on its own isn't enough. Anybody can
+                    claim that their service is private.
+                  </p>
+
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    We are taking all of the necessary steps to prove that our
+                    service is private by introducing a layer of verifiable
+                    trust to nilGPT, making it possible for anyone to confirm
+                    that nilGPT is behaving exactly as promised.
+                  </p>
+
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    Alongside smaller upgrades like bug fixes, the two key
+                    features of this release are:
+                  </p>
+
+                  <ol className="list-decimal list-inside text-navy-700 leading-relaxed mb-6 space-y-2">
+                    <li>open-sourcing the nilGPT repository.</li>
+                    <li>exposing attestations inside nilGPT.</li>
+                  </ol>
+
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    Why should this matter to you? Because open source alone
+                    isn't a guarantee.
+                  </p>
+
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    nilGPT could, in theory, run different code in the
+                    background. Attestations close that gap, giving you a way to
+                    check that the code running nilGPT is the same code
+                    published in the repository. That means you don't just have
+                    to trust us—you can verify it yourself.
+                  </p>
+
+                  <p className="text-navy-700 leading-relaxed mb-8">
+                    In the rest of this post, we dive into the details.
+                  </p>
+
+                  {/* Divider */}
+                  <hr className="border-navy-900 my-8" />
+
+                  {/* Section 1 */}
+                  <section>
+                    <h2 className="font-display font-black text-2xl text-navy-900 mb-4">
+                      1. Open-Sourcing the Code
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      The nilGPT codebase is now open source. You can find the
+                      repository here:{" "}
+                      <a
+                        href="https://github.com/NillionNetwork/nilgpt"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        https://github.com/NillionNetwork/nilgpt
+                      </a>
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      This means anyone —not just our team —can look at the
+                      code, review it, and understand exactly what's happening
+                      under the hood.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      Transparency is the foundation of verifiable trust, and
+                      open-sourcing the repository is our way of letting the
+                      world see, first hand, how the app is working.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      For developers, it will also allow for external
+                      contributions or even the ability to run it totally
+                      locally, if so desired.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      Open sourcing the code, however, is not fool-proof. Let's
+                      dive into why attestations are a vital component below.
+                    </p>
+                  </section>
+
+                  {/* Divider */}
+                  <hr className="border-navy-900 my-8" />
+
+                  {/* Section 2 */}
+                  <section>
+                    <h2 className="font-display font-black text-2xl text-navy-900 mb-4">
+                      2. Attestations Exposed in the App
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      This release also gives users the ability to see and
+                      verify attestations inside nilGPT. These attestations are
+                      generated in nilCC (where nilGPT runs) within a TEE.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      A TEE, or a trusted execution environment, is special
+                      hardware that executes code in a secure enclave.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-6">
+                      In short, in the app itself, you can now verify that the
+                      code running in the app matches the code open-source
+                      repository and not a modified version.
+                    </p>
+
+                    {/* Attestation Image */}
+                    <div className="my-8">
+                      <Image
+                        src="/img/attestation.png"
+                        alt="nilGPT Attestation Interface"
+                        width={800}
+                        height={600}
+                        className="w-full h-auto border-2 border-navy-900 rounded-lg"
+                        priority
+                      />
+                    </div>
+
+                    <h3 className="font-display font-bold text-xl text-navy-900 mb-4">
+                      What are Attestations?
+                    </h3>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      Attestations are cryptographic proofs generated by TEEs.
+                      They act like a seal of authenticity, proving that the
+                      program inside the TEE, or the TEE itself, have not been
+                      tampered with. The key part of the attestation that we are
+                      exposing in this release is the measurement hash.
+                    </p>
+
+                    <h3 className="font-display font-bold text-xl text-navy-900 mb-4">
+                      What is a Measurement Hash and what do I need to check?
+                    </h3>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      You can think of a measurement hash like a fingerprint for
+                      software. When the TEE starts up, it takes the code and
+                      configuration that will run inside it, and creates a
+                      unique cryptographic fingerprint (the hash).
+                    </p>
+
+                    <ul className="list-disc list-inside text-navy-700 leading-relaxed mb-4 space-y-2">
+                      <li>If the code changes, the hash changes.</li>
+                      <li>
+                        If the hash matches the hash produced from the open
+                        source repository, you know the code hasn't been
+                        altered.
+                      </li>
+                    </ul>
+
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      As of this release, the measurement hash generated in the
+                      TEE can be fetched by the user directly on nilGPT meaning
+                      users can:
+                    </p>
+
+                    <ol className="list-decimal list-inside text-navy-700 leading-relaxed mb-4 space-y-2">
+                      <li>
+                        See the measurement hash generated in nilCC (the TEE).
+                      </li>
+                      <li>
+                        Compare it with a pre-computed hash (generated from the
+                        open-source repository).
+                      </li>
+                      <li>
+                        If the two match, you can be confident the TEE is
+                        running exactly the same code as the open-source nilGPT.
+                      </li>
+                    </ol>
+
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      This is a big step toward verifiable trust as it removes
+                      the need to just trust that the code running is the code
+                      from the open sourced repository.
+                    </p>
+
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      Note that currently, the pre-computed hash of the open
+                      source code base is exactly that: pre-computed by us. In
+                      future versions, we will give anyone the ability to easily
+                      generate this hash independently, further strengthening
+                      trust and transparency.
+                    </p>
+                  </section>
+
+                  {/* Divider */}
+                  <hr className="border-navy-900 my-8" />
+
+                  {/* Looking Ahead */}
+                  <section>
+                    <h2 className="font-display font-bold text-2xl text-navy-900 mb-4">
+                      Looking Ahead
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      This release marks another milestone in nilGPT's journey
+                      to verifiably trust.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      We plan to release new versions and features continuously
+                      over the next few months.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      Some forthcoming features to get excited about include:
+                      voice notes, image and PDF uploads, dark mode, and more.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed">Stay tuned!</p>
+                  </section>
+                </div>
+
+                {/* Toggle Button */}
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setIsExpandedFirst(!isExpandedFirst)}
+                    className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
+                  >
+                    {isExpandedFirst ? "Show Less" : "Read More"}
+                  </button>
+                </div>
+              </article>
+            </div>
+
+            {/* Second Article - Original Post */}
             <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
               <article className="space-y-8">
                 {/* Main Title */}
                 <h1 className="font-display font-black text-3xl lg:text-4xl text-navy-900 mb-6">
                   Why We Built nilGPT: Towards True Incognito Mode for ChatGPT
                 </h1>
+
+                {/* Date */}
+                <div className="text-navy-600 text-sm font-medium mb-8">
+                  August 9, 2025
+                </div>
 
                 {/* The Uncomfortable Truth About AI's Data Vacuum */}
                 <section>
@@ -67,7 +325,7 @@ export default function ContentPolicy() {
 
                 {/* Expandable Content - All remaining content */}
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? "max-h-none" : "max-h-0"}`}
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpandedSecond ? "max-h-none" : "max-h-0"}`}
                 >
                   {/* Remaining paragraphs from first section */}
                   <section className="mb-8">
@@ -523,10 +781,10 @@ export default function ContentPolicy() {
                 {/* Toggle Button */}
                 <div className="text-center mt-6">
                   <button
-                    onClick={() => setIsExpanded(!isExpanded)}
+                    onClick={() => setIsExpandedSecond(!isExpandedSecond)}
                     className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
                   >
-                    {isExpanded ? "Show Less" : "Read More"}
+                    {isExpandedSecond ? "Show Less" : "Read More"}
                   </button>
                 </div>
               </article>
