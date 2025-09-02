@@ -77,7 +77,9 @@ export default function ContentPolicy() {
 
                 {/* Expandable Content */}
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpandedFirst ? "max-h-none" : "max-h-0"}`}
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                    isExpandedFirst ? "max-h-none" : "max-h-0"
+                  }`}
                 >
                   <p className="text-navy-700 leading-relaxed mb-4">
                     Still, claiming privacy on its own isn't enough. Anybody can
@@ -325,7 +327,9 @@ export default function ContentPolicy() {
 
                 {/* Expandable Content - All remaining content */}
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpandedSecond ? "max-h-none" : "max-h-0"}`}
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                    isExpandedSecond ? "max-h-none" : "max-h-0"
+                  }`}
                 >
                   {/* Remaining paragraphs from first section */}
                   <section className="mb-8">
