@@ -7,6 +7,8 @@ import { DEFAULT_MODEL } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
+import { LocalStorageService } from "@/services/LocalStorage";
+import { LOCAL_STORAGE_KEY_MAP } from "@/services/LocalStorage/constants";
 import { useStreamingChat } from "../../hooks/useStreamingChat";
 import type { ChatMessage as MessageType } from "../../types/chat";
 import ChatInput from "./ChatInput";
@@ -362,20 +364,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
                 updateChatTitle()
                   .then(() => {
-                    try {
-                      const chatHistory = JSON.parse(
-                        localStorage.getItem("chatHistory") || "[]",
-                      );
-                      const updatedHistory = chatHistory.filter(
-                        (chat: any) => chat.title !== "Untitled Chat",
-                      );
-                      localStorage.setItem(
-                        "chatHistory",
-                        JSON.stringify(updatedHistory),
-                      );
-                    } catch (error) {
-                      console.error("Failed to clean up localStorage:", error);
-                    }
+                    LocalStorageService.removeUntitledChats();
 
                     if (typeof window !== "undefined") {
                       window.dispatchEvent(new Event("sidebar:refresh"));

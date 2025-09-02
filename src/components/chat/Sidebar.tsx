@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
+import { LocalStorageService } from "@/services/LocalStorage";
 import AttestationModal from "../AttestationModal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
@@ -143,21 +144,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
             const realIds = new Set(realChats.map((c: ChatItem) => c._id));
 
             setChatHistory((prev) => {
-              let optimistic: ChatItem[] = [];
-              try {
-                const localChats = JSON.parse(
-                  localStorage.getItem("chatHistory") || "[]",
-                );
-                optimistic = localChats.filter(
-                  (c: ChatItem) =>
-                    !realIds.has(c._id) && c.title === "Untitled Chat",
-                );
-              } catch (error) {
-                console.error(
-                  "Error reading localStorage for optimistic updates:",
-                  error,
-                );
-              }
+              const localChats = LocalStorageService.getChatHistory();
+              const optimistic = localChats.filter(
+                (c: ChatItem) =>
+                  !realIds.has(c._id) && c.title === "Untitled Chat",
+              );
 
               return [...optimistic, ...realChats];
             });
@@ -186,22 +177,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
         return;
       }
 
-      try {
-        const chatHistory = JSON.parse(
-          localStorage.getItem("chatHistory") || "[]",
-        );
-        const cleanHistory = chatHistory.filter(
-          (chat: any) => chat.title !== "Untitled Chat",
-        );
-        if (cleanHistory.length !== chatHistory.length) {
-          localStorage.setItem("chatHistory", JSON.stringify(cleanHistory));
-        }
-      } catch (error) {
-        console.error(
-          "Failed to clean localStorage on sidebar refresh:",
-          error,
-        );
-      }
+      LocalStorageService.removeUntitledChats();
 
       getChats();
     };
@@ -218,12 +194,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
     // Optimistic update
     setChatHistory((prev) => [newChat, ...prev]);
 
-    try {
-      const chats = JSON.parse(localStorage.getItem("chatHistory") || "[]");
-      localStorage.setItem("chatHistory", JSON.stringify([newChat, ...chats]));
-    } catch (error) {
-      console.error("Failed to update localStorage:", error);
-    }
+    LocalStorageService.addChatToHistory(newChat);
 
     router.push(`/app/chat/${newChat._id}`);
 
