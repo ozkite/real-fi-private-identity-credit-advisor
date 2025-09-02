@@ -362,6 +362,21 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
                 updateChatTitle()
                   .then(() => {
+                    try {
+                      const chatHistory = JSON.parse(
+                        localStorage.getItem("chatHistory") || "[]",
+                      );
+                      const updatedHistory = chatHistory.filter(
+                        (chat: any) => chat.title !== "Untitled Chat",
+                      );
+                      localStorage.setItem(
+                        "chatHistory",
+                        JSON.stringify(updatedHistory),
+                      );
+                    } catch (error) {
+                      console.error("Failed to clean up localStorage:", error);
+                    }
+
                     if (typeof window !== "undefined") {
                       window.dispatchEvent(new Event("sidebar:refresh"));
                     }

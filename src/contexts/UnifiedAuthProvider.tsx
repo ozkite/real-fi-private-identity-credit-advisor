@@ -79,7 +79,15 @@ export function UnifiedAuthProvider({
       };
     }
 
-    setUser(unifiedUser);
+    setUser((prev) => {
+      if (!prev && !unifiedUser) return prev;
+      if (!prev || !unifiedUser) return unifiedUser;
+
+      return prev.id === unifiedUser.id &&
+        prev.isAuthenticated === unifiedUser.isAuthenticated
+        ? prev
+        : unifiedUser;
+    });
   }, [supabaseUser, authenticated, privyUser]);
 
   const signIn = async (email: string, password: string) => {

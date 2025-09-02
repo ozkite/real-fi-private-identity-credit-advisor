@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -25,8 +25,10 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const { decrypt, hasSecretKey } = useEncryption();
 
+  const currentChatId = pathname?.match(/\/app\/chat\/(.+)/)?.[1];
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
@@ -140,24 +142,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           processChats().then((realChats) => {
             const realIds = new Set(realChats.map((c: ChatItem) => c._id));
 
-            if (realChats.length > 0) {
-              setChatHistory(realChats);
-              return;
-            }
-
             setChatHistory((prev) => {
-              const optimistic = prev.filter(
-                (c: ChatItem) =>
-                  !realIds.has(c._id) &&
-                  c.title === "Untitled Chat" &&
-                  typeof window !== "undefined" &&
-                  window.location.pathname.endsWith(c._id),
-              );
+              let optimistic: ChatItem[] = [];
+              try {
+                const localChats = JSON.parse(
+                  localStorage.getItem("chatHistory") || "[]",
+                );
+                optimistic = localChats.filter(
+                  (c: ChatItem) =>
+                    !realIds.has(c._id) && c.title === "Untitled Chat",
+                );
+              } catch (error) {
+                console.error(
+                  "Error reading localStorage for optimistic updates:",
+                  error,
+                );
+              }
+
               return [...optimistic, ...realChats];
             });
           });
 
-          // Return current state while processing
           return prev;
         });
       } catch (error) {
@@ -180,6 +185,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
       if (isCreatingChat) {
         return;
       }
+
+      try {
+        const chatHistory = JSON.parse(
+          localStorage.getItem("chatHistory") || "[]",
+        );
+        const cleanHistory = chatHistory.filter(
+          (chat: any) => chat.title !== "Untitled Chat",
+        );
+        if (cleanHistory.length !== chatHistory.length) {
+          localStorage.setItem("chatHistory", JSON.stringify(cleanHistory));
+        }
+      } catch (error) {
+        console.error(
+          "Failed to clean localStorage on sidebar refresh:",
+          error,
+        );
+      }
+
       getChats();
     };
     window.addEventListener("sidebar:refresh", handleSidebarRefresh);
@@ -295,19 +318,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
                 ))}
               </div>
             ) : (
-              chatHistory.map((chat) => (
-                <Link
-                  href={`/app/chat/${chat._id}`}
-                  key={chat._id}
-                  className="w-full flex items-center justify-between text-left px-4 py-2 text-md text-white hover:bg-[#333534]  rounded-md"
-                >
-                  <span className="flex-1 truncate">
-                    {!chat.title || chat.title === "null"
-                      ? "Untitled"
-                      : chat.title}
-                  </span>
-                </Link>
-              ))
+              chatHistory.map((chat) => {
+                const isActive = currentChatId === chat._id;
+                return (
+                  <Link
+                    href={`/app/chat/${chat._id}`}
+                    key={chat._id}
+                    className={`w-full flex items-center justify-between text-left px-4 py-2 text-md rounded-md ${
+                      isActive
+                        ? "bg-[#333534] text-white"
+                        : "text-white hover:bg-[#333534]"
+                    }`}
+                  >
+                    <span className="flex-1 truncate">
+                      {!chat.title || chat.title === "null"
+                        ? "Untitled"
+                        : chat.title}
+                    </span>
+                  </Link>
+                );
+              })
             )}
           </div>
         </div>
