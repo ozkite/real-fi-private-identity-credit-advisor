@@ -84,7 +84,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit} className="relative flex flex-col">
-        <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 p-3 pt-4 pb-2">
+        <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 p-4 pb-2">
           {/* Text input at top */}
           <div className="mb-2">
             <textarea
@@ -143,7 +143,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                   isAuthenticated === false ||
                   isOverLimit
                 }
-                className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-200 ${
+                className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200 ${
                   input.trim() && !isOverLimit && isAuthenticated
                     ? "bg-neutral-800 text-yellow-400 hover:bg-neutral-700"
                     : "bg-neutral-300 text-neutral-500"
