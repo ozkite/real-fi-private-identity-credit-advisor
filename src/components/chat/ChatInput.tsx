@@ -1,8 +1,8 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import PersonaSelector from "./PersonaSelector";
-import { useApp } from "@/contexts/AppContext";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;

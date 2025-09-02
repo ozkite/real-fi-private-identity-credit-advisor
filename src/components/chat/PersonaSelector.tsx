@@ -83,15 +83,15 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
         </button>
 
         {disabled && (
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
             Create a new chat to change mode
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0"></div>
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0"></div>
           </div>
         )}
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1 max-h-64 overflow-y-auto">
             {personas.map((persona) => (
               <button

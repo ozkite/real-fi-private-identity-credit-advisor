@@ -3,8 +3,8 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function ContentPolicy() {
