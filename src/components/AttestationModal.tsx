@@ -34,7 +34,7 @@ const AttestationModal = () => {
     measurementHash.toLowerCase() === deployedMeasurementHash.toLowerCase();
 
   return (
-    <DialogContent className="rounded-lg max-w-3xl max-h-[90svh] overflow-y-auto max-md:max-w-[calc(100svw-16px)] max-sm:p-4">
+    <DialogContent className="rounded-lg max-w-3xl max-h-[90svh] overflow-y-auto max-md:max-w-[calc(100svw-16px)] max-sm:p-4 bg-[#f7f6f2]">
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold text-center mb-6 max-sm:text-xl max-sm:mb-4">
           Attestation & Verification

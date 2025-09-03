@@ -32,6 +32,9 @@ const PWAInstallInstructionsModal: React.FC = () => {
               </p>
             </li>
           </div>
+          <p className="text-gray-800 text-xs italic mt-2">
+            Hint: If the above do not work, try again on Safari
+          </p>
         </div>
       );
     }
