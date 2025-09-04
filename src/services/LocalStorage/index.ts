@@ -37,4 +37,13 @@ export const LocalStorageService = {
     const filtered = current.filter((chat) => chat.title !== "Untitled Chat");
     LocalStorageService.setChatHistory(filtered);
   },
+
+  removeUntitledChatsNotIn: (idsToKeep: string[] | Set<string>): void => {
+    const keep = new Set(idsToKeep);
+    const current = LocalStorageService.getChatHistory();
+    const filtered = current.filter(
+      (chat) => chat.title !== "Untitled Chat" || keep.has(chat._id),
+    );
+    LocalStorageService.setChatHistory(filtered);
+  },
 };
