@@ -8,7 +8,6 @@ import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
-import { LOCAL_STORAGE_KEY_MAP } from "@/services/LocalStorage/constants";
 import { useStreamingChat } from "../../hooks/useStreamingChat";
 import type { ChatMessage as MessageType } from "../../types/chat";
 import ChatInput from "./ChatInput";

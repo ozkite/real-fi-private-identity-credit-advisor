@@ -143,7 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           processChats().then((realChats) => {
             const realIds = new Set(realChats.map((c: ChatItem) => c._id));
 
-            setChatHistory((prev) => {
+            setChatHistory((_prev) => {
               const localChats = LocalStorageService.getChatHistory();
               const optimistic = localChats.filter(
                 (c: ChatItem) =>
