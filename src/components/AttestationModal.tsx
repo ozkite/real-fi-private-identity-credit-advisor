@@ -13,7 +13,7 @@ import { Button } from "./ui/button";
 import { DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 const AttestationModal = () => {
-  const { nonce, measurementHash, isLoading, getMeasurementHash } =
+  const { measurementHash, isLoading, getMeasurementHash } =
     useNilCCMeasurementHash();
   const { deployedMeasurementHash, version } = useDeployedMeasurementHash();
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
@@ -54,19 +54,16 @@ const AttestationModal = () => {
               </AccordionTrigger>
               <AccordionContent className="p-0 mt-1">
                 <p className="text-xs text-gray-600">
-                  You can do this yourself by making a POST request to{" "}
+                  You can do this yourself by hex encoding report.measurement
+                  from{" "}
                   <a
-                    href="https://nilgpt.xyz/nilcc/api/v1/report/generate"
+                    href="https://nilgpt.xyz/nilcc/api/v1/report"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 underline"
                   >
-                    https://nilgpt.xyz/nilcc/api/v1/report/generate
+                    https://nilgpt.xyz/nilcc/api/v1/report
                   </a>{" "}
-                  with body:{" "}
-                  <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono break-all">
-                    {"{nonce: 64hex}"}
-                  </code>
                   .
                 </p>
               </AccordionContent>
@@ -77,19 +74,11 @@ const AttestationModal = () => {
             <div className="space-y-3">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    POST
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">GET</span>
                   <code className="text-sm font-mono text-gray-600 bg-gray-100 px-1 py-0.5 rounded break-all">
-                    https://nilgpt.xyz/nilcc/api/v1/report/generate
+                    https://nilgpt.xyz/nilcc/api/v1/report
                   </code>
                 </div>
-                <input
-                  type="text"
-                  value={`{"nonce": "${nonce}"}`}
-                  readOnly
-                  className="flex-1 px-3 py-2 text-sm bg-white border border-gray-300 rounded-md font-mono"
-                />
               </div>
 
               {measurementHash && (
