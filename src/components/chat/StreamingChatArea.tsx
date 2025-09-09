@@ -269,7 +269,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     }
   }, [initialMessages, messages.length]);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, imageDataUrl?: string) => {
     if (!user) {
       console.error("No authenticated user found");
       return;
@@ -279,9 +279,23 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
     const userMessage: MessageType = {
       role: "user",
-      content,
+      content: imageDataUrl
+        ? [
+            { type: "image_url", image_url: { url: imageDataUrl } },
+            { type: "text", text: content },
+          ]
+        : content,
     };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessageContentText =
+      typeof userMessage.content === "string"
+        ? userMessage.content
+        : userMessage.content.find((content) => content.type === "text")
+            ?.text || "";
+
+    setMessages((prev) => [
+      ...prev,
+      { ...userMessage, content: userMessageContentText },
+    ]);
 
     setTimeout(() => scrollToBottom(true), 100);
 
@@ -329,7 +343,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
               await createMessage(
                 newChatId.message,
                 "user",
-                userMessage.content,
+                userMessageContentText,
                 1,
               );
               await createMessage(
@@ -348,7 +362,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                   createMessage(
                     currentChatId,
                     "user",
-                    userMessage.content,
+                    userMessageContentText,
                     totalMessages - 1,
                   ),
                   createMessage(
@@ -389,7 +403,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                     ? createMessage(
                         currentChatId,
                         "user",
-                        userMessage.content,
+                        userMessageContentText,
                         totalMessages - 1,
                       )
                     : Promise.resolve(),

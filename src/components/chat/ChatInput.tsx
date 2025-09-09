@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import PersonaSelector from "./PersonaSelector";
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, imageDataUrl?: string) => void;
   isLoading: boolean;
   placeholder?: string;
   showActionButtons?: boolean;
@@ -36,7 +36,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     openFilePicker,
     filesContent,
     loading: isLoadingFilePicker,
-    clear,
+    clear: clearPickedFile,
   } = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
@@ -93,8 +93,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
     e.preventDefault();
     if (!input.trim() || isLoading || !isAuthenticated || isOverLimit) return;
 
-    onSendMessage(input);
+    onSendMessage(input, filesContent?.[0]?.content);
     setInput("");
+    clearPickedFile();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -120,7 +121,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               />
               <button
                 type="button"
-                onClick={clear}
+                onClick={clearPickedFile}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-1 -right-1 items-center"
               >
                 <XIcon size={12} />
