@@ -53,7 +53,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className={bubbleClasses}>
         <div className={markdownProseClasses}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {message.content}
+            {message.content as string}
           </ReactMarkdown>
           {isStreaming && !isUser && (
             <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1 align-text-bottom" />
@@ -63,7 +63,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         {!isUser && (
           <div className="flex mt-2 space-x-2">
             <button
-              onClick={() => copyToClipboard(message.content)}
+              onClick={() => copyToClipboard(message.content as string)}
               className="p-1 text-neutral-500 hover:text-neutral-700"
               title={isCopied ? "Copied!" : "Copy to clipboard"}
             >

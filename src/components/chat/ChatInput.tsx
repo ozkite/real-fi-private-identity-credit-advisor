@@ -1,11 +1,18 @@
-import type React from "react";
+import { ImageIcon, XIcon } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useFilePicker } from "use-file-picker";
+import {
+  FileAmountLimitValidator,
+  FileSizeValidator,
+  FileTypeValidator,
+} from "use-file-picker/validators";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import PersonaSelector from "./PersonaSelector";
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, imageDataUrl?: string) => void;
   isLoading: boolean;
   placeholder?: string;
   showActionButtons?: boolean;
@@ -23,8 +30,31 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const isAuthenticated = !!user;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { isSidebarCollapsed, toggleSidebar, setSelectedPersona, hasMessages } =
-    useApp();
+  const { setSelectedPersona, hasMessages } = useApp();
+
+  const {
+    openFilePicker,
+    filesContent,
+    loading: isLoadingFilePicker,
+    clear: clearPickedFile,
+  } = useFilePicker({
+    readAs: "DataURL",
+    accept: "image/*",
+    multiple: false,
+    validators: [
+      new FileAmountLimitValidator({ max: 1 }),
+      new FileTypeValidator([
+        "jpg",
+        "png",
+        "jpeg",
+        "webp",
+        "heic",
+        "heif",
+        "bmp",
+      ]),
+      new FileSizeValidator({ maxFileSize: 5 * 1024 * 1024 }), // 5MB
+    ],
+  });
 
   const handlePersonaChange = (personaId: string) => {
     setSelectedPersona(personaId);
@@ -35,14 +65,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768); // Tailwind's md breakpoint (768px)
     };
-
-    // Check on mount
     checkMobile();
-
-    // Add resize listener
     window.addEventListener("resize", checkMobile);
-
-    // Cleanup
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -69,8 +93,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
     e.preventDefault();
     if (!input.trim() || isLoading || !isAuthenticated || isOverLimit) return;
 
-    onSendMessage(input);
+    onSendMessage(input, filesContent?.[0]?.content);
     setInput("");
+    clearPickedFile();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -85,7 +110,25 @@ const ChatInput: React.FC<ChatInputProps> = ({
     <div className="w-full">
       <form onSubmit={handleSubmit} className="relative flex flex-col">
         <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 p-4 pb-2">
-          {/* Text input at top */}
+          {filesContent.length > 0 && (
+            <div className="mb-2 relative flex self-end w-fit">
+              <Image
+                src={filesContent[0].content}
+                width={100}
+                height={100}
+                alt=""
+                className="w-auto h-auto max-h-12 object-contain opacity-80 rounded-sm max-w-36"
+              />
+              <button
+                type="button"
+                onClick={clearPickedFile}
+                className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-1 -right-1 items-center"
+              >
+                <XIcon size={12} />
+              </button>
+            </div>
+          )}
+
           <div className="mb-2">
             <textarea
               ref={textareaRef}
@@ -121,14 +164,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
             `}</style>
           </div>
 
-          {/* Bottom row with left and right sections */}
           <div className="flex items-center justify-between">
-            {/* Left section - for future tools/features */}
             <div className="flex items-center gap-2">
-              {/* Future: attachment button, tools, etc. */}
+              <button
+                type="button"
+                onClick={openFilePicker}
+                disabled={isLoading || isLoadingFilePicker || !isAuthenticated}
+                className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ImageIcon size={18} />
+              </button>
             </div>
-
-            {/* Right section - PersonaSelector + Send button */}
             <div className="flex items-center gap-2">
               <PersonaSelector
                 onPersonaChange={handlePersonaChange}
@@ -138,10 +184,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 name="submitButton"
                 type="submit"
                 disabled={
-                  isLoading ||
-                  !input.trim() ||
-                  isAuthenticated === false ||
-                  isOverLimit
+                  isLoading || !input.trim() || !isAuthenticated || isOverLimit
                 }
                 className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-200 ${
                   input.trim() && !isOverLimit && isAuthenticated

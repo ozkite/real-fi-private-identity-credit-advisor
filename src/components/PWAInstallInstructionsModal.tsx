@@ -12,9 +12,10 @@ const PWAInstallInstructionsModal: React.FC = () => {
   const isIOS = browser.getOS().name === "iOS";
   const isSafari = browser.getBrowser().name === "Safari";
   const isChrome = browser.getBrowser().name === "Chrome";
+  const isBrave = "brave" in navigator;
 
   const getPWAInstallInstructions = () => {
-    if (isSafari) {
+    if (isSafari && !isBrave) {
       return (
         <div className="text-gray-800 flex flex-wrap items-start gap-1">
           <p>To install nilGPT </p>
@@ -32,9 +33,6 @@ const PWAInstallInstructionsModal: React.FC = () => {
               </p>
             </li>
           </div>
-          <p className="text-gray-800 text-xs italic mt-2">
-            Hint: If the above do not work, try again on Safari
-          </p>
         </div>
       );
     }
@@ -48,7 +46,7 @@ const PWAInstallInstructionsModal: React.FC = () => {
       );
     }
 
-    if (isChrome) {
+    if (isChrome && !isBrave) {
       return (
         <div className="text-gray-800 flex flex-wrap items-start gap-1">
           <p>To install nilGPT</p>
