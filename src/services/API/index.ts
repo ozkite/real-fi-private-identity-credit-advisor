@@ -11,14 +11,9 @@ const apiService = axios.create({
 });
 
 const API = {
-  async generateNilCCReport(nonce: string | null) {
-    if (!nonce) {
-      return null;
-    }
-
-    return apiService.post<INilCCReportGenerationResponse>(
+  async generateNilCCReport() {
+    return apiService.get<INilCCReportGenerationResponse>(
       API_ENDPOINTS.NILCC_GENERATE_REPORT,
-      { nonce },
     );
   },
 };

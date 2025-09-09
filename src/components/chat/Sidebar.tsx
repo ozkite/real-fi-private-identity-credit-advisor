@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
@@ -34,6 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const [isAttestationModalOpen, setIsAttestationModalOpen] = useState(false);
+  const staleChatsRef = useRef(false);
 
   // Utility function to truncate wallet address
   const truncateAddress = (address: string) => {
@@ -141,9 +142,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           };
 
           processChats().then((realChats) => {
-            const realIds = new Set(realChats.map((c: ChatItem) => c._id));
+            const realIds = new Set<string>(
+              realChats.map((c: ChatItem) => c._id),
+            );
 
-            setChatHistory((_prev) => {
+            if (!staleChatsRef.current) {
+              LocalStorageService.removeUntitledChatsNotIn(realIds);
+              staleChatsRef.current = true;
+            }
+
+            setChatHistory(() => {
               const localChats = LocalStorageService.getChatHistory();
               const optimistic = localChats.filter(
                 (c: ChatItem) =>
