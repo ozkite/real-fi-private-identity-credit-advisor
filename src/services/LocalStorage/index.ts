@@ -46,4 +46,18 @@ export const LocalStorageService = {
     );
     LocalStorageService.setChatHistory(filtered);
   },
+
+  removeChatFromHistory: (chatId: string): void => {
+    const current = LocalStorageService.getChatHistory();
+    const filtered = current.filter((chat) => chat._id !== chatId);
+    LocalStorageService.setChatHistory(filtered);
+  },
+
+  updateChatTitle: (chatId: string, newTitle: string): void => {
+    const current = LocalStorageService.getChatHistory();
+    const updated = current.map((chat) =>
+      chat._id === chatId ? { ...chat, title: newTitle } : chat,
+    );
+    LocalStorageService.setChatHistory(updated);
+  },
 };
