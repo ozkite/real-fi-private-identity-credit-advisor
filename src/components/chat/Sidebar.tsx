@@ -34,6 +34,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const [isAttestationModalOpen, setIsAttestationModalOpen] = useState(false);
+  const [contextMenuChatId, setContextMenuChatId] = useState<string | null>(
+    null,
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
   const staleChatsRef = useRef(false);
 
   // Utility function to truncate wallet address
@@ -195,6 +202,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
     };
   }, [user, hasSecretKey, decrypt, isCreatingChat]); // Added hasSecretKey dependency
 
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (_event: MouseEvent) => {
+      if (contextMenuChatId) {
+        setContextMenuChatId(null);
+      }
+    };
+
+    if (contextMenuChatId) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [contextMenuChatId]);
+
   const handleNewChat = async () => {
     setIsCreatingChat(true);
     const newChat = { _id: uuidv4(), title: "Untitled Chat" };
@@ -211,6 +235,94 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
     }, 500);
   };
 
+  const handleDeleteChat = async (chatId: string) => {
+    if (isDeleting) return;
+
+    setIsDeleting(true);
+    setContextMenuChatId(null);
+
+    try {
+      const response = await fetch("/api/deleteChat", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ chatId }),
+      });
+
+      if (response.ok) {
+        // Remove from local state
+        setChatHistory((prev) => prev.filter((chat) => chat._id !== chatId));
+
+        // Remove from localStorage
+        LocalStorageService.removeChatFromHistory(chatId);
+
+        // If we're currently viewing the deleted chat, redirect to home
+        if (currentChatId === chatId) {
+          router.push("/app");
+        }
+      } else {
+        console.error("Failed to delete chat");
+      }
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleRenameChat = (chatId: string, currentTitle: string) => {
+    setEditingChatId(chatId);
+    setEditingTitle(currentTitle);
+    setContextMenuChatId(null);
+  };
+
+  const handleSaveRename = async (chatId: string) => {
+    if (isRenaming || !editingTitle.trim()) return;
+
+    setIsRenaming(true);
+
+    try {
+      const response = await fetch("/api/updateChat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: chatId,
+          title: editingTitle.trim(),
+        }),
+      });
+
+      if (response.ok) {
+        // Update local state
+        setChatHistory((prev) =>
+          prev.map((chat) =>
+            chat._id === chatId
+              ? { ...chat, title: editingTitle.trim() }
+              : chat,
+          ),
+        );
+
+        // Update localStorage
+        LocalStorageService.updateChatTitle(chatId, editingTitle.trim());
+      } else {
+        console.error("Failed to rename chat");
+      }
+    } catch (error) {
+      console.error("Error renaming chat:", error);
+    } finally {
+      setIsRenaming(false);
+      setEditingChatId(null);
+      setEditingTitle("");
+    }
+  };
+
+  const handleCancelRename = () => {
+    setEditingChatId(null);
+    setEditingTitle("");
+  };
+
   return (
     <div
       className={`
@@ -218,6 +330,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
         bg-[#000201] flex flex-col
         fixed inset-y-0 left-0 z-40
         md:relative md:inset-auto md:left-auto
+        overflow-hidden
         ${isCollapsed ? "hidden" : "block"}
       `}
     >
@@ -262,7 +375,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           </button>
         </div>
 
-        <div className="flex-grow overflow-y-auto px-2">
+        <div className="flex-grow overflow-y-auto overflow-x-hidden px-2">
           <button
             data-umami-event="sidebar-new-chat-button"
             disabled={!user}
@@ -299,22 +412,156 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
             ) : (
               chatHistory.map((chat) => {
                 const isActive = currentChatId === chat._id;
+                const showContextMenu = contextMenuChatId === chat._id;
+                const isEditing = editingChatId === chat._id;
+                const displayTitle =
+                  !chat.title || chat.title === "null"
+                    ? "Untitled"
+                    : chat.title;
+
                 return (
-                  <Link
-                    href={`/app/chat/${chat._id}`}
+                  <div
                     key={chat._id}
-                    className={`w-full flex items-center justify-between text-left px-4 py-2 text-md rounded-md ${
+                    className={`w-full flex items-center justify-between text-left px-4 py-2 text-md rounded-md group relative ${
                       isActive
                         ? "bg-[#333534] text-white"
                         : "text-white hover:bg-[#333534]"
                     }`}
                   >
-                    <span className="flex-1 truncate">
-                      {!chat.title || chat.title === "null"
-                        ? "Untitled"
-                        : chat.title}
-                    </span>
-                  </Link>
+                    {isEditing ? (
+                      <div className="flex-1 flex items-center min-w-0">
+                        <input
+                          type="text"
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSaveRename(chat._id);
+                            } else if (e.key === "Escape") {
+                              handleCancelRename();
+                            }
+                          }}
+                          className="flex-1 bg-transparent text-white border border-[#555] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#FFC971] min-w-0 max-w-[180px]"
+                          autoFocus
+                        />
+                        <div className="flex items-center ml-1">
+                          <button
+                            onClick={() => handleSaveRename(chat._id)}
+                            disabled={isRenaming}
+                            className="text-green-400 hover:text-green-300 disabled:opacity-50 p-0.5"
+                          >
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={handleCancelRename}
+                            className="text-gray-400 hover:text-gray-300 p-0.5 ml-0.5"
+                          >
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <Link
+                          href={`/app/chat/${chat._id}`}
+                          className="flex-1 truncate"
+                        >
+                          {displayTitle}
+                        </Link>
+
+                        {/* Three-dot menu button */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setContextMenuChatId(
+                              showContextMenu ? null : chat._id,
+                            );
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-[#444] rounded"
+                        >
+                          <svg
+                            className="w-4 h-4 text-gray-400"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </button>
+
+                        {/* Context Menu */}
+                        {showContextMenu && (
+                          <div className="absolute right-0 top-full mt-1 w-32 bg-[#2a2a2a] border border-[#444] rounded-lg shadow-lg z-50">
+                            <button
+                              onClick={() =>
+                                handleRenameChat(chat._id, displayTitle)
+                              }
+                              disabled={isRenaming}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-[#333] rounded-lg transition-colors disabled:opacity-50"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                              Rename
+                            </button>
+                            <button
+                              onClick={() => handleDeleteChat(chat._id)}
+                              disabled={isDeleting}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-[#333] rounded-lg transition-colors disabled:opacity-50"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 );
               })
             )}
