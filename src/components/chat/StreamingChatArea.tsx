@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_MODEL } from "@/config/personas";
@@ -8,7 +7,6 @@ import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
-import { LOCAL_STORAGE_KEY_MAP } from "@/services/LocalStorage/constants";
 import { useStreamingChat } from "../../hooks/useStreamingChat";
 import type { ChatMessage as MessageType } from "../../types/chat";
 import ChatInput from "./ChatInput";
@@ -20,6 +18,33 @@ interface StreamingChatAreaProps {
   chatId?: string | null;
   hasDecryptionFailures?: boolean;
 }
+
+interface ChatSuggestion {
+  emoji: string;
+  text: string;
+}
+
+const getChatSuggestions = (persona: string): ChatSuggestion[] => {
+  const suggestions: Record<string, ChatSuggestion[]> = {
+    "personal-assistant": [
+      { emoji: "📅", text: "Help me plan my week" },
+      { emoji: "📧", text: "Draft an email for me" },
+      { emoji: "📝", text: "I need an agenda for my meeting" },
+    ],
+    "wellness-assistant": [
+      { emoji: "😌", text: "I'm feeling stressed..." },
+      { emoji: "💤", text: "How can I sleep better?" },
+      { emoji: "🧘", text: "Guide me through a meditation session" },
+    ],
+    companion: [
+      { emoji: "👋", text: "Hey, how was your day?" },
+      { emoji: "🃏", text: "Want to play a game?" },
+      { emoji: "🎬", text: "What movie would you recommend?" },
+    ],
+  };
+
+  return suggestions[persona] || suggestions.companion;
+};
 
 const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
   initialMessages = [],
@@ -456,19 +481,22 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
               )}
             </div>
 
-            <div className="mt-6">
-              <div className="flex items-center justify-center p-2 px-4 bg-[#ECE9DF] rounded-3xl">
-                <div className="flex items-center space-x-3">
-                  <Image
-                    src="/img/hidden_icon.svg"
-                    alt="Hidden"
-                    width={24}
-                    height={24}
-                  />
-                  <span className="text-md md:text-lg text-center font-medium text-gray-700">
-                    All the data here is private forever
-                  </span>
-                </div>
+            <div className="mt-8">
+              <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
+                {getChatSuggestions(selectedPersona).map(
+                  (suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSendMessage(suggestion.text)}
+                      className="flex items-center space-x-2 p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-left group w-fit"
+                    >
+                      <div className="text-lg">{suggestion.emoji}</div>
+                      <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700">
+                        {suggestion.text}
+                      </span>
+                    </button>
+                  ),
+                )}
               </div>
             </div>
           </div>

@@ -56,12 +56,12 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
       <div className="relative group">
         <button
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`flex items-center justify-between px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors ${
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors ${
             disabled ? "cursor-not-allowed opacity-50" : ""
           }`}
           disabled={disabled}
         >
-          <span className="text-sm font-medium mr-2 truncate max-w-[120px]">
+          <span className="text-sm font-medium truncate max-w-[160px] sm:max-w-[180px]">
             {selectedPersona.name}
           </span>
           <svg

@@ -129,7 +129,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
             </div>
 
             {/* Right section - PersonaSelector + Send button */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <PersonaSelector
                 onPersonaChange={handlePersonaChange}
                 disabled={hasMessages}
