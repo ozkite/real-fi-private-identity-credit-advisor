@@ -302,7 +302,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
     setMessages((prev) => [
       ...prev,
-      { ...userMessage, content: userMessageContentText },
+      {
+        ...userMessage,
+        content: userMessageContentText,
+        attachments: userMessageAttachments,
+      },
     ]);
 
     setTimeout(() => scrollToBottom(true), 100);
