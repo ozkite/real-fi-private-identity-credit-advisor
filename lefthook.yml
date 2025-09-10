@@ -12,6 +12,11 @@ pre-commit:
 pre-push:
   jobs:
     - name: biome-check
-      run: pnpm lint "{push_files}"
+      run: |
+        # Filter push files to only include files that Biome can process
+        biome_files=$(echo "{push_files}" | tr ' ' '\n' | grep -E '\.(ts|js|tsx|mjs|json)$' | tr '\n' ' ')
+        if [ -n "$biome_files" ]; then
+          pnpm lint $biome_files
+        fi
     - name: tsc-check
       run: pnpm exec tsc
