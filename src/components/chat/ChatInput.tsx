@@ -175,7 +175,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 <ImageIcon size={18} />
               </button>
             </div>
-            <div className="flex items-center gap-2">
+
+            {/* Right section - PersonaSelector + Send button */}
+            <div className="flex items-center gap-1">
               <PersonaSelector
                 onPersonaChange={handlePersonaChange}
                 disabled={hasMessages}
