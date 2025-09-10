@@ -26,7 +26,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-  const [selectedPersona, setSelectedPersona] = useState("companion");
+  const [selectedPersona, setSelectedPersona] = useState("personal-assistant");
   const [hasMessages, setHasMessages] = useState(false);
   const [userSecretKeySeed, setUserSecretKeySeed] = useState<string | null>(
     null,
