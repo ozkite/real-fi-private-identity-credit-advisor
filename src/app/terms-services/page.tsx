@@ -131,16 +131,12 @@ export default function TermsOfService() {
                 </p>
                 <ol className="list-decimal list-inside text-navy-700 space-y-2 mb-4">
                   <li>
-                    meta-llama/Llama-3.2-3B:
-                    https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
+                    google/gemma-3-27b-it:
+                    https://huggingface.co/google/gemma-3-27b-it
                   </li>
                   <li>
                     meta-llama/Llama-3.1-8B:
                     https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
-                  </li>
-                  <li>
-                    Deepseek-R1-Distill-Qwen-14B:
-                    https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
                   </li>
                   <li>
                     openai/gpt-oss-20b:
