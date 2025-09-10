@@ -1,3 +1,5 @@
+import type { TMessageAttachment } from "./schemas";
+
 export interface ITextContent {
   type: "text";
   text: string;
@@ -15,4 +17,5 @@ export type IChatMessageContent = ITextContent | IImageContent;
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string | IChatMessageContent[];
+  attachments?: TMessageAttachment[];
 }

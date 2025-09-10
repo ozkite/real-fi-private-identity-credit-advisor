@@ -52,6 +52,7 @@ export default function ChatPage({ params }: ChatPageProps) {
               return {
                 ...message,
                 content: result.content,
+                attachments: message?.attachments,
               };
             }),
           );
