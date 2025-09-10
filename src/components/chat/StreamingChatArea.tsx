@@ -10,6 +10,7 @@ import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
 import { useStreamingChat } from "../../hooks/useStreamingChat";
 import type { ChatMessage as MessageType } from "../../types/chat";
+import type { TMessageAttachment } from "../../types/schemas";
 import ChatInput from "./ChatInput";
 import ChatMessage from "./ChatMessage";
 
@@ -183,12 +184,15 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     }
   };
 
-  const createMessage = async (
-    chatId: string,
-    role: "user" | "assistant",
-    content: string,
-    order: number,
-  ) => {
+  const createMessage = async (message: {
+    chatId: string;
+    role: "user" | "assistant";
+    content: string;
+    order: number;
+    attachments?: TMessageAttachment[];
+  }) => {
+    const { chatId, role, content, order, attachments } = message;
+
     if (!user) {
       console.error("No authenticated user found");
       return;
@@ -220,6 +224,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
           model: DEFAULT_MODEL,
           creator: user?.id,
           blindfoldContent: blindfoldContent,
+          attachments,
         }),
       });
 
@@ -291,6 +296,9 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         ? userMessage.content
         : userMessage.content.find((content) => content.type === "text")
             ?.text || "";
+    const userMessageAttachments: TMessageAttachment[] = imageDataUrl
+      ? ["image"]
+      : [];
 
     setMessages((prev) => [
       ...prev,
@@ -340,18 +348,19 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
               chatIdRef.current = newChatId.message;
 
               // Add the two messages to the chat
-              await createMessage(
-                newChatId.message,
-                "user",
-                userMessageContentText,
-                1,
-              );
-              await createMessage(
-                newChatId.message,
-                "assistant",
-                finalContent,
-                2,
-              );
+              await createMessage({
+                chatId: newChatId.message,
+                role: "user",
+                content: userMessageContentText,
+                order: 1,
+                attachments: userMessageAttachments,
+              });
+              await createMessage({
+                chatId: newChatId.message,
+                role: "assistant",
+                content: finalContent,
+                order: 2,
+              });
             }
 
             if (totalMessages === 4) {
@@ -359,18 +368,19 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
               if (currentChatId) {
                 await Promise.all([
-                  createMessage(
-                    currentChatId,
-                    "user",
-                    userMessageContentText,
-                    totalMessages - 1,
-                  ),
-                  createMessage(
-                    currentChatId,
-                    "assistant",
-                    finalContent,
-                    totalMessages,
-                  ),
+                  createMessage({
+                    chatId: currentChatId,
+                    role: "user",
+                    content: userMessageContentText,
+                    order: totalMessages - 1,
+                    attachments: userMessageAttachments,
+                  }),
+                  createMessage({
+                    chatId: currentChatId,
+                    role: "assistant",
+                    content: finalContent,
+                    order: totalMessages,
+                  }),
                 ]);
 
                 setIsUpdatingChat(true);
@@ -400,22 +410,23 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 await Promise.all([
                   // ODD (User)
                   (totalMessages - 1) % 2 === 1
-                    ? createMessage(
-                        currentChatId,
-                        "user",
-                        userMessageContentText,
-                        totalMessages - 1,
-                      )
+                    ? createMessage({
+                        chatId: currentChatId,
+                        role: "user",
+                        content: userMessageContentText,
+                        order: totalMessages - 1,
+                        attachments: userMessageAttachments,
+                      })
                     : Promise.resolve(),
 
                   // EVEN (Assistant)
                   totalMessages % 2 === 0
-                    ? createMessage(
-                        currentChatId,
-                        "assistant",
-                        finalContent,
-                        totalMessages,
-                      )
+                    ? createMessage({
+                        chatId: currentChatId,
+                        role: "assistant",
+                        content: finalContent,
+                        order: totalMessages,
+                      })
                     : Promise.resolve(),
                 ]);
 

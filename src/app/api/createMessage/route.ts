@@ -13,7 +13,15 @@ export async function POST(request: NextRequest) {
     const auth = await requireAuth(request);
 
     const body = await request.json();
-    const { chat_id, role, order, timestamp, model, blindfoldContent } = body;
+    const {
+      chat_id,
+      role,
+      order,
+      timestamp,
+      model,
+      blindfoldContent,
+      attachments,
+    } = body;
 
     if (!chat_id || !role || !blindfoldContent || order === undefined) {
       return NextResponse.json(
@@ -42,6 +50,7 @@ export async function POST(request: NextRequest) {
       timestamp: timestamp,
       model: model,
       signature: "",
+      attachments,
     };
 
     const builder = await setupClient();

@@ -16,6 +16,8 @@ export interface CHAT_SCHEMA {
   persona?: string;
 }
 
+export type TMessageAttachment = "image" | "pdf" | "csv" | "audio";
+
 export interface MESSAGES_SCHEMA {
   _id: string;
   chat_id: string;
@@ -29,4 +31,5 @@ export interface MESSAGES_SCHEMA {
   model: string;
   signature: string;
   token_count?: string;
+  attachments?: TMessageAttachment[];
 }
