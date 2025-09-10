@@ -6,6 +6,7 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage as MessageType } from "../../types/chat";
+import getMessageAttachmentIcon from "../../utils/getMessageAttachmentIcon";
 
 interface ChatMessageProps {
   message: MessageType;
@@ -49,7 +50,24 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   `;
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
+    <div
+      className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2 relative`}
+    >
+      {message.attachments && message.attachments.length > 0 && (
+        <div className="flex absolute -top-4 right-0 gap-1 items-center">
+          <span className="text-neutral-500 text-xs">Attached</span>
+          <div className="flex gap-1 items-center">
+            {message.attachments.map((attachment) => {
+              const AttachmentIcon = getMessageAttachmentIcon(attachment);
+              return (
+                <div key={attachment}>
+                  <AttachmentIcon size={12} className="text-neutral-500" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
       <div className={bubbleClasses}>
         <div className={markdownProseClasses}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
