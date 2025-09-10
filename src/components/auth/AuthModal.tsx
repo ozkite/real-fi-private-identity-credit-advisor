@@ -114,8 +114,8 @@ export default function AuthModal({
                 checked={keepMePosted}
                 onChange={(e) => setKeepMePosted(e.target.checked)}
               />
-              <span className="text-xs text-gray-600">
-                Keep me posted on what&apos;s new
+              <span className="items-start text-[10px] text-gray-600">
+                Keep me posted on what&apos;s new via marketing emails
               </span>
             </label>
           </div>
