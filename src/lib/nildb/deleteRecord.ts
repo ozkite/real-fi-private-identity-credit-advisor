@@ -18,7 +18,7 @@ export async function deleteRecord(
   }
 
   const deleteRequest: DeleteDataRequest = {
-    collection: collectionId as any, // Cast to Uuid type
+    collection: collectionId,
     filter,
   };
 

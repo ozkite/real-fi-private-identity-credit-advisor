@@ -8,6 +8,7 @@ import SidebarIcon from "@/components/chat/SidebarIcon";
 import SignInButton from "@/components/chat/SignInButton";
 import SignOutButton from "@/components/chat/SignOutButton";
 import SignUpButton from "@/components/chat/SignUpButton";
+import UserCreationHandler from "@/components/UserCreationHandler";
 import { AppProvider, useApp } from "@/contexts/AppContext";
 import { UnifiedAuthProvider, useAuth } from "@/contexts/UnifiedAuthProvider";
 import PrivyProvider from "@/providers/PrivyProvider";
@@ -66,6 +67,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       {authMode && (
         <AuthModal mode={authMode} onClose={() => setAuthMode(null)} />
       )}
+
+      {/* Handle automatic user creation in nilDB */}
+      <UserCreationHandler />
     </div>
   );
 }

@@ -49,10 +49,23 @@ export async function POST(request: NextRequest) {
     }
 
     const creationTime = new Date().toISOString();
+
+    // Get UTM parameters from request body if provided
+    let utmData: USER_SCHEMA["utm"];
+    try {
+      const body = await request.json();
+      if (body.utm && Object.keys(body.utm).length > 0) {
+        utmData = body.utm;
+      }
+    } catch (_error) {
+      // If no body or invalid JSON, continue without UTM data
+    }
+
     const userData: USER_SCHEMA = {
       _id: recordId,
       provider: auth.authProvider,
       created_at: creationTime,
+      ...(utmData && { utm: utmData }),
     };
 
     await writeRecord(builder, process.env.USER_COLLECTION_ID, userData);

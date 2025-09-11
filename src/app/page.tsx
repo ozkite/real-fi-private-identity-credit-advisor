@@ -1,11 +1,13 @@
 "use client";
 
 import { Download } from "lucide-react";
+import { useEffect } from "react";
 import Footer from "@/components/landingPage/Footer";
 import PWAInstallInstructionsModal from "@/components/PWAInstallInstructionsModal";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import usePWAInstallInstructionsModal from "@/hooks/usePWAInstallInstructionsModal";
+import { captureAndStoreUTMParameters } from "@/utils/utmTracking";
 import FAQSection from "../components/landingPage/FAQSection";
 import FeaturesSection from "../components/landingPage/FeaturesSection";
 import Header from "../components/landingPage/Header";
@@ -18,6 +20,14 @@ export default function Home() {
     isPWAInstallInstructionsModalOpen,
     setIsPWAInstallInstructionsModalOpen,
   } = usePWAInstallInstructionsModal();
+
+  // Capture and store UTM parameters on landing page load
+  useEffect(() => {
+    const utmParams = captureAndStoreUTMParameters();
+    if (Object.keys(utmParams).length > 0) {
+      console.log("UTM parameters captured:", utmParams);
+    }
+  }, []);
 
   return (
     <main className="relative">

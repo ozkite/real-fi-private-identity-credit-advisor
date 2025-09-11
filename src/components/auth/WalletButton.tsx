@@ -1,6 +1,7 @@
 import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { getUTMParametersForRegistration } from "@/utils/utmTracking";
 
 interface WalletButtonProps {
   onClose?: () => void;
@@ -20,9 +21,18 @@ function WalletButton({ onClose }: WalletButtonProps) {
         "Content-Type": "application/json",
       };
 
+      // Get UTM parameters for user registration
+      const utmParams = getUTMParametersForRegistration();
+      const requestBody =
+        Object.keys(utmParams).length > 0 ? { utm: utmParams } : {};
+
       const response = await fetch("/api/createUser", {
         method: "POST",
         headers,
+        body:
+          Object.keys(requestBody).length > 0
+            ? JSON.stringify(requestBody)
+            : undefined,
       });
 
       const result = await response.json();
