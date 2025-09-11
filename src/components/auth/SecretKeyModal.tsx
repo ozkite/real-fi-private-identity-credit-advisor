@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "@/contexts/AppContext";
 
 interface SecretKeyModalProps {
@@ -12,7 +12,13 @@ interface SecretKeyModalProps {
 export function SecretKeyModal({ isOpen, onClose }: SecretKeyModalProps) {
   const [secretKey, setSecretKey] = useState("");
   const [error, setError] = useState("");
-  const { setUserSecretKeySeed } = useApp();
+  const { setUserSecretKeySeed, userSecretKeySeed } = useApp();
+
+  useEffect(() => {
+    if (isOpen && userSecretKeySeed) {
+      onClose();
+    }
+  }, [isOpen, userSecretKeySeed, onClose]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
