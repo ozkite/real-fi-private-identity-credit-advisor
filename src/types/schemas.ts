@@ -2,6 +2,13 @@ export interface USER_SCHEMA {
   _id: string;
   provider: string;
   created_at: string;
+  utm?: {
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_term?: string;
+    utm_content?: string;
+  };
 }
 
 export interface CHAT_SCHEMA {

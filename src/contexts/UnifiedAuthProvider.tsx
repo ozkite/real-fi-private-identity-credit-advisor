@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { getUTMParametersForRegistration } from "@/utils/utmTracking";
 
 interface UnifiedUser {
   id: string;
@@ -105,11 +106,26 @@ export function UnifiedAuthProvider({
     name: string,
     emailConsent: boolean,
   ) => {
+    // Get UTM parameters to include in email confirmation link
+    const utmParams = getUTMParametersForRegistration();
+
+    // Build the redirect URL with UTM parameters
+    let redirectUrl = `${window.location.origin}/app`;
+    if (Object.keys(utmParams).length > 0) {
+      const urlParams = new URLSearchParams();
+      Object.entries(utmParams).forEach(([key, value]) => {
+        if (value) {
+          urlParams.append(key, value);
+        }
+      });
+      redirectUrl += `?${urlParams.toString()}`;
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: redirectUrl,
         data: {
           name: name,
           email_consent: emailConsent,
