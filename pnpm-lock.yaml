@@ -38,6 +38,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.49.4
         version: 2.54.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@types/umami':
+        specifier: ^2.10.1
+        version: 2.10.1
       axios:
         specifier: ^1.11.0
         version: 1.11.0(debug@4.4.1)
@@ -1191,6 +1194,9 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+
+  '@types/umami@2.10.1':
+    resolution: {integrity: sha512-CvOEMq+BFOUXj8yciq4hPsdOt0o9KBg5jQXnF1FrdOMKZMxJiwryyZNLa9Ud2NVO6nXSwU22YMKR3E+Xhbo+DA==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -5975,6 +5981,8 @@ snapshots:
   '@types/stylis@4.2.5': {}
 
   '@types/trusted-types@2.0.7': {}
+
+  '@types/umami@2.10.1': {}
 
   '@types/unist@2.0.11': {}
 

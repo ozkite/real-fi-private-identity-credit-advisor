@@ -372,7 +372,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
 
         <div className="flex-grow overflow-y-auto overflow-x-hidden px-2">
           <button
-            data-umami-event="sidebar-new-chat-button"
+            data-umami-event="New Chat Clicked"
             disabled={!user}
             className={`w-full text-sm font-medium text-white transition-colors text-left px-4 py-1 rounded-lg
               ${
@@ -525,6 +525,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
               variant="default"
               size="sm"
               className="self-center bg-[#FFC971] rounded-full w-fit gap-2 px-4 my-4 hover:bg-[#FFC971]/90"
+              data-umami-event="Attestation Clicked"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-black" />
               <span className="text-sm text-black">Attestation</span>

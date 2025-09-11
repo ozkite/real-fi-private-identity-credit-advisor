@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DEFAULT_MODEL } from "@/config/personas";
+import { DEFAULT_MODEL, getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
@@ -332,7 +332,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         : userMessage.content.find((content) => content.type === "text")
             ?.text || "";
 
-    let userMessageAttachments: TMessageAttachment[];
+    let userMessageAttachments: TMessageAttachment[] | undefined;
     if (imageDataUrl) {
       userMessageAttachments = ["image"];
     }
@@ -479,6 +479,14 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         },
         selectedPersona,
       );
+
+      window.umami.track("Message Sent", {
+        persona: getPersonaById(selectedPersona)?.name,
+        ...(userMessageAttachments &&
+          userMessageAttachments.length > 0 && {
+            attachments: userMessageAttachments,
+          }),
+      });
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => {
@@ -577,7 +585,6 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
               <div className="max-w-4xl mx-auto w-full">
                 <div className="max-w-2xl mx-auto">
                   <ChatInput
-                    data-umami-event="chat-send-message-button"
                     onSendMessage={handleSendMessage}
                     isLoading={isLoading || isStreaming || isUpdatingChat}
                     placeholder="What do you want to ask?"
