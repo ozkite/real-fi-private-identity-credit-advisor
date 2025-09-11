@@ -303,8 +303,26 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     // Only update if we don't have messages yet, or if initialMessages is different
     if (messages.length === 0 && initialMessages.length > 0) {
       setMessages(initialMessages);
+      // Scroll to bottom after initial messages are set
+      setTimeout(() => scrollToBottom(true), 100);
     }
-  }, [initialMessages, messages.length]);
+  }, [initialMessages, messages.length, scrollToBottom]);
+
+  // Handle chat ID changes (when switching between chats)
+  useEffect(() => {
+    if (initialChatId && initialChatId !== chatId) {
+      setChatId(initialChatId);
+      chatIdRef.current = initialChatId;
+    }
+  }, [initialChatId, chatId]);
+
+  // Scroll to bottom when chat ID changes and we have messages
+  useEffect(() => {
+    if (chatId && messages.length > 0) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => scrollToBottom(true), 150);
+    }
+  }, [chatId, messages.length, scrollToBottom]);
 
   const handleSendMessage = async (content: string, imageDataUrl?: string) => {
     if (!user) {
