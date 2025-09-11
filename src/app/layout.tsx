@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import RedditPixel from "@/components/RedditPixel";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
@@ -40,7 +39,6 @@ export default function RootLayout({
         src="https://cloud.umami.is/script.js"
         data-website-id="4f63bc18-938c-46f0-a0c1-873a43098e28"
       />
-      <RedditPixel />
       <ServiceWorkerRegistration />
     </html>
   );
