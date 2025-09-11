@@ -2,12 +2,13 @@
 
 import bowser from "bowser";
 import { useEffect, useState } from "react";
+import useIsPWA from "./useIsPWA";
 
 const usePWAInstallInstructionsModal = () => {
   const browser = bowser.getParser(navigator.userAgent);
   const isDesktop = browser.getPlatformType() === "desktop";
+  const { isPWA } = useIsPWA();
 
-  const [isPWAInstalled, setIsPWAInstalled] = useState(false);
   const [
     isPWAInstallInstructionsModalOpen,
     setIsPWAInstallInstructionsModalOpen,
@@ -18,12 +19,10 @@ const usePWAInstallInstructionsModal = () => {
   ] = useState(false);
 
   useEffect(() => {
-    setIsPWAInstalled(window.matchMedia("(display-mode: standalone)").matches);
-  }, []);
-
-  useEffect(() => {
-    setShouldShowPWAInstallInstructionsModal(!isDesktop && !isPWAInstalled);
-  }, [isPWAInstalled]);
+    if (isPWA !== null) {
+      setShouldShowPWAInstallInstructionsModal(!isDesktop && !isPWA);
+    }
+  }, [isPWA]);
 
   return {
     shouldShowPWAInstallInstructionsModal,
