@@ -114,12 +114,12 @@ const AttestationModal = () => {
                 disabled={isLoading}
                 size="sm"
                 className="flex items-center gap-2 ml-auto"
-                data-umami-event="Generate Attestation Clicked"
+                data-umami-event="Fetch Attestation Clicked"
               >
                 <RefreshCw
                   className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
                 />
-                Generate
+                Fetch
               </Button>
             </div>
           </div>
