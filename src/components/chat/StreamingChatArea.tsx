@@ -497,14 +497,6 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         },
         selectedPersona,
       );
-
-      window.umami.track("Message Sent", {
-        persona: getPersonaById(selectedPersona)?.name,
-        ...(userMessageAttachments &&
-          userMessageAttachments.length > 0 && {
-            attachments: userMessageAttachments,
-          }),
-      });
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => {
@@ -516,6 +508,14 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         return updated;
       });
     }
+
+    window.umami.track("Message Sent", {
+      persona: getPersonaById(selectedPersona)?.name,
+      ...(userMessageAttachments &&
+        userMessageAttachments.length > 0 && {
+          attachments: userMessageAttachments,
+        }),
+    });
   };
 
   return (

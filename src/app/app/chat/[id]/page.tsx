@@ -14,7 +14,7 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ params }: ChatPageProps) {
-  const { selectedPersona, userSecretKeySeed } = useApp();
+  const { selectedPersona, userSecretKeySeed, setUserSecretKeySeed } = useApp();
 
   // biome-ignore lint/suspicious/noExplicitAny: TODO: add type
   const [messages, setMessages] = useState<any[]>([]);
@@ -24,6 +24,15 @@ export default function ChatPage({ params }: ChatPageProps) {
   const [passphraseLoaded, setPassphraseLoaded] = useState(false);
   const { user } = useAuth();
   const { decryptWithStatus, hasSecretKey } = useEncryption();
+
+  // Function to handle updating passphrase
+  const handleUpdatePassphrase = () => {
+    // Clear the current passphrase from both context and session storage
+    setUserSecretKeySeed("");
+    sessionStorage.removeItem("userSecretKeySeed");
+    // Open the modal
+    setShowSecretKeyModal(true);
+  };
 
   // Track when passphrase has been loaded from session storage
   useEffect(() => {
@@ -141,7 +150,7 @@ export default function ChatPage({ params }: ChatPageProps) {
                     </p>
                   </div>
                   <button
-                    onClick={() => setShowSecretKeyModal(true)}
+                    onClick={handleUpdatePassphrase}
                     className="ml-4 px-4 py-2 bg-[#FFC971] text-black text-sm font-medium rounded-full hover:bg-[#FFD584] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFC971]"
                   >
                     Update Passphrase
