@@ -70,11 +70,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         Just store in messages. 
 
     2. Update Chat with Title (updateChatTitle)
-        If message_count === 4 (2nd user + assistant message)
+        If message_count === 2 (1st user + assistant message)
         We have enough context to summarize the chat for a title
 
     3. Update chat for message_count purpose (updateChat)
-        If message_count > 4, we can just keep updating message_count
+        If message_count >= 3, we can just keep updating message_count
 */
 
   const createInitialChat = async () => {
@@ -111,7 +111,10 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     }
   };
 
-  const updateChatTitle = async () => {
+  const updateChatTitle = async (
+    chatIdToUpdate?: string,
+    conversationMessages?: MessageType[],
+  ) => {
     // 1. Call LLM Chat API for summary
     let title = null;
 
@@ -120,9 +123,12 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
       content: "Summarize this conversation in three words or less",
     };
 
+    // Use the provided conversation messages or fall back to current messages
+    const messagesToUse = conversationMessages || messages;
+
     try {
       const summaryContent = await sendMessage(
-        [...messages, summaryMessage],
+        [...messagesToUse, summaryMessage],
         {},
         selectedPersona,
       );
@@ -159,9 +165,9 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         method: "POST",
         headers,
         body: JSON.stringify({
-          _id: chatId,
+          _id: chatIdToUpdate || chatId,
           title: encryptedTitle,
-          message_count: 4,
+          message_count: 2,
         }),
       });
 
@@ -391,50 +397,37 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 content: finalContent,
                 order: 2,
               });
-            }
 
-            if (totalMessages === 4) {
-              const currentChatId = chatIdRef.current || chatId;
+              // Update chat title immediately after first back and forth
+              setIsUpdatingChat(true);
 
-              if (currentChatId) {
-                await Promise.all([
-                  createMessage({
-                    chatId: currentChatId,
-                    role: "user",
+              try {
+                // Pass the current conversation including the user message and assistant response
+                const currentConversation: MessageType[] = [
+                  ...messages,
+                  {
+                    role: "user" as const,
                     content: userMessageContentText,
-                    order: totalMessages - 1,
                     attachments: userMessageAttachments,
-                  }),
-                  createMessage({
-                    chatId: currentChatId,
-                    role: "assistant",
-                    content: finalContent,
-                    order: totalMessages,
-                  }),
-                ]);
+                  },
+                  { role: "assistant" as const, content: finalContent },
+                ];
+                await updateChatTitle(newChatId.message, currentConversation);
+                LocalStorageService.removeUntitledChats();
 
-                setIsUpdatingChat(true);
-
-                updateChatTitle()
-                  .then(() => {
-                    LocalStorageService.removeUntitledChats();
-
-                    if (typeof window !== "undefined") {
-                      window.dispatchEvent(new Event("sidebar:refresh"));
-                    }
-                  })
-                  .catch((error) => {
-                    console.warn("Title update failed:", error);
-                  })
-                  .finally(() => {
-                    setTimeout(() => {
-                      setIsUpdatingChat(false);
-                    }, 1000);
-                  });
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new Event("sidebar:refresh"));
+                }
+              } catch (error) {
+                console.warn("Title update failed:", error);
+              } finally {
+                setTimeout(() => {
+                  setIsUpdatingChat(false);
+                }, 1000);
               }
             }
 
-            if (totalMessages >= 5) {
+            if (totalMessages >= 3) {
               const currentChatId = chatIdRef.current || chatId;
               if (currentChatId) {
                 await Promise.all([
