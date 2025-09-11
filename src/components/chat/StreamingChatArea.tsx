@@ -328,9 +328,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         ? userMessage.content
         : userMessage.content.find((content) => content.type === "text")
             ?.text || "";
-    const userMessageAttachments: TMessageAttachment[] = imageDataUrl
-      ? ["image"]
-      : [];
+
+    let userMessageAttachments: TMessageAttachment[];
+    if (imageDataUrl) {
+      userMessageAttachments = ["image"];
+    }
 
     setMessages((prev) => [
       ...prev,
