@@ -21,8 +21,21 @@ export default function ChatPage({ params }: ChatPageProps) {
   const [loading, setLoading] = useState(true);
   const [hasDecryptionFailures, setHasDecryptionFailures] = useState(false);
   const [showSecretKeyModal, setShowSecretKeyModal] = useState(false);
+  const [passphraseLoaded, setPassphraseLoaded] = useState(false);
   const { user } = useAuth();
   const { decryptWithStatus, hasSecretKey } = useEncryption();
+
+  // Track when passphrase has been loaded from session storage
+  useEffect(() => {
+    // Check if passphrase exists in session storage
+    const storedPassphrase = sessionStorage.getItem("userSecretKeySeed");
+    if (storedPassphrase || userSecretKeySeed) {
+      setPassphraseLoaded(true);
+    } else if (storedPassphrase === null) {
+      // No passphrase in session storage, we can proceed
+      setPassphraseLoaded(true);
+    }
+  }, [userSecretKeySeed]);
 
   useEffect(() => {
     const fetchChatMessages = async (chatId: string) => {
@@ -70,22 +83,31 @@ export default function ChatPage({ params }: ChatPageProps) {
         setLoading(false);
       }
     };
-    if (user) {
+    if (user && passphraseLoaded) {
       fetchChatMessages(params.id);
-    } else {
+    } else if (!user) {
       setLoading(false);
       setMessages([]);
       return;
     }
-  }, [params.id, user, userSecretKeySeed, decryptWithStatus, hasSecretKey]);
+  }, [
+    params.id,
+    user,
+    userSecretKeySeed,
+    decryptWithStatus,
+    hasSecretKey,
+    passphraseLoaded,
+  ]);
 
-  // Show loading if fetching messages (but not if just waiting for secret key)
-  if (loading && userSecretKeySeed) {
+  // Show loading if fetching messages or waiting for passphrase to load
+  if (loading || !passphraseLoaded) {
     return (
       <div className="flex items-center justify-center h-full p-6">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"></div>
-          <p className="text-gray-600 text-center">Loading messages...</p>
+          <p className="text-gray-600 text-center">
+            {!passphraseLoaded ? "Loading..." : "Loading messages..."}
+          </p>
         </div>
       </div>
     );

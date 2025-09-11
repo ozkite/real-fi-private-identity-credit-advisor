@@ -31,6 +31,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [userSecretKeySeed, setUserSecretKeySeed] = useState<string | null>(
     null,
   );
+  const [wasAuthenticated, setWasAuthenticated] = useState<boolean | null>(
+    null,
+  );
+
+  // Load passphrase from session storage on mount
+  useEffect(() => {
+    const storedPassphrase = sessionStorage.getItem("userSecretKeySeed");
+    if (storedPassphrase) {
+      setUserSecretKeySeed(storedPassphrase);
+    }
+  }, []);
 
   const toggleSidebar = () => {
     if (!user || !user.isAuthenticated) {
@@ -39,12 +50,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
-  // Clear userSecretKeySeed when user signs out
+  // Custom setter that also saves to session storage
+  const setUserSecretKeySeedWithStorage = (key: string) => {
+    setUserSecretKeySeed(key);
+    sessionStorage.setItem("userSecretKeySeed", key);
+  };
+
+  // Track authentication state changes and clear passphrase only on actual sign out
   useEffect(() => {
-    if (!user || !user.isAuthenticated) {
-      setUserSecretKeySeed(null);
+    const isCurrentlyAuthenticated = user?.isAuthenticated ?? false;
+
+    // If this is the first time we're checking auth state, just record it
+    if (wasAuthenticated === null) {
+      setWasAuthenticated(isCurrentlyAuthenticated);
+      return;
     }
-  }, [user]);
+
+    // If user was authenticated before and now is not, they signed out
+    if (wasAuthenticated && !isCurrentlyAuthenticated) {
+      setUserSecretKeySeed(null);
+      sessionStorage.removeItem("userSecretKeySeed");
+    }
+
+    // Update the previous state
+    setWasAuthenticated(isCurrentlyAuthenticated);
+  }, [user, wasAuthenticated]);
 
   const value: AppContextType = {
     isSidebarCollapsed,
@@ -55,7 +85,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     hasMessages,
     setHasMessages,
     userSecretKeySeed,
-    setUserSecretKeySeed,
+    setUserSecretKeySeed: setUserSecretKeySeedWithStorage,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
