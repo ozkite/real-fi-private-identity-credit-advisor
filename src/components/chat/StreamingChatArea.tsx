@@ -6,6 +6,7 @@ import { DEFAULT_MODEL } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
+import useIsPWA from "@/hooks/useIsPWA";
 import { LocalStorageService } from "@/services/LocalStorage";
 import { useStreamingChat } from "../../hooks/useStreamingChat";
 import type { ChatMessage as MessageType } from "../../types/chat";
@@ -62,6 +63,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
   const { user } = useAuth();
   const { setHasMessages, selectedPersona } = useApp();
   const { encrypt, hasSecretKey } = useEncryption();
+  const { isPWA } = useIsPWA();
 
   /*
    CHAT
@@ -257,6 +259,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
           creator: user?.id,
           blindfoldContent: blindfoldContent,
           attachments,
+          ...(isPWA && { pwa: true }),
         }),
       });
 

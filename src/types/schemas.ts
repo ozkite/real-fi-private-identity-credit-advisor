@@ -32,4 +32,5 @@ export interface MESSAGES_SCHEMA {
   signature: string;
   token_count?: string;
   attachments?: TMessageAttachment[];
+  pwa?: boolean;
 }
