@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import StreamingChatArea from "@/components/chat/StreamingChatArea";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
+import { captureAndStoreUTMParameters } from "@/utils/utmTracking";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -13,6 +14,14 @@ export default function HomePage() {
 
   const { selectedPersona } = useApp();
   const { user } = useAuth();
+
+  // Capture UTM parameters when landing on app page (e.g., from email confirmation)
+  useEffect(() => {
+    const utmParams = captureAndStoreUTMParameters();
+    if (Object.keys(utmParams).length > 0) {
+      console.log("UTM parameters captured on app page:", utmParams);
+    }
+  }, []);
 
   useEffect(() => {
     if (!user?.isAuthenticated || !user?.id) {
