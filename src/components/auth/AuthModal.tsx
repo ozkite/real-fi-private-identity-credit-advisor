@@ -152,6 +152,9 @@ export default function AuthModal({
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
+              data-umami-event={
+                mode === "signin" ? "Sign In Clicked" : "Sign Up Clicked"
+              }
             >
               {mode === "signin" ? "Sign In" : "Sign Up"}
             </button>

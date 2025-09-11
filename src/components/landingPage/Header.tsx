@@ -49,7 +49,7 @@ const Header = () => {
 
           <Link
             href="/app"
-            data-umami-event="home-go-to-app-button"
+            data-umami-event="Go To App Clicked"
             className="bg-[#F7F6F2] text-black px-4 py-2 font-medium text-lg rounded-full hover:bg-[#F0EFE9] transition-colors flex items-center gap-2"
           >
             <div className="w-2 h-2 bg-black rounded-full"></div>

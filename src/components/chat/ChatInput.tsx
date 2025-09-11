@@ -7,6 +7,7 @@ import {
   FileSizeValidator,
   FileTypeValidator,
 } from "use-file-picker/validators";
+import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import PersonaSelector from "./PersonaSelector";
@@ -30,7 +31,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const isAuthenticated = !!user;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { setSelectedPersona, hasMessages } = useApp();
+  const { setSelectedPersona, hasMessages, selectedPersona } = useApp();
 
   const {
     openFilePicker,
@@ -58,6 +59,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   const handlePersonaChange = (personaId: string) => {
     setSelectedPersona(personaId);
+    window.umami.track("Mode Changed", {
+      from: getPersonaById(selectedPersona)?.name,
+      to: getPersonaById(personaId)?.name,
+    });
   };
 
   // Mobile detection effect
