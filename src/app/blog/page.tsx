@@ -10,6 +10,7 @@ import { useState } from "react";
 export default function ContentPolicy() {
   const [isExpandedFirst, setIsExpandedFirst] = useState(false);
   const [isExpandedSecond, setIsExpandedSecond] = useState(false);
+  const [isExpandedThird, setIsExpandedThird] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -44,7 +45,154 @@ export default function ContentPolicy() {
 
           {/* Content */}
           <div className="prose prose-lg max-w-none space-y-8">
-            {/* First Article - New Post */}
+            {/* Newest Article - nilGPT v4 */}
+            <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
+              <article className="space-y-8">
+                {/* Main Title */}
+                <h1 className="font-display font-black text-3xl lg:text-4xl text-navy-900 mb-6">
+                  nilGPT v4: Image uploads and bigger models
+                </h1>
+
+                {/* Date */}
+                <div className="text-navy-600 text-sm font-medium mb-8">
+                  September 11, 2025
+                </div>
+
+                {/* Introduction */}
+                <p className="text-navy-700 leading-relaxed mb-6">
+                  A new week comes with a new release of nilGPT. We're keeping
+                  up the rhythm and shipping fast. Every release takes us one
+                  step closer toward building the most privacy-preserving and
+                  capable AI assistant. We believe this is something that needs
+                  to exist for those sensitive questions that ChatGPT and others
+                  should never have their eyes on.
+                </p>
+
+                {/* Expandable Content */}
+                <div
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                    isExpandedThird ? "max-h-none" : "max-h-0"
+                  }`}
+                >
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    Two weeks ago, we shipped attestation flows, giving you the
+                    ability to verify that nilGPT is running exactly the code we
+                    open-sourced. Last week, we rolled out the PWA, so you can
+                    install nilGPT directly on your mobile device for a more
+                    seamless experience.
+                  </p>
+
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    This week, we're turning up the dial again with two major
+                    new capabilities: bigger models and image uploads.
+                  </p>
+
+                  {/* Major Features Section */}
+                  <section className="mb-8">
+                    <h2 className="font-display font-bold text-2xl text-navy-900 mb-4">
+                      Major Features
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      The first big upgrade is the introduction of Gemma 3 27B,
+                      a state-of-the-art model that significantly increases the
+                      power of nilGPT. As a reminder, all of our models run on
+                      bare-metal servers inside TEEs (trusted execution
+                      environments). That means there is no reliance on
+                      third-party clouds, no hidden data pipelines, and the same
+                      uncompromising privacy guarantees we've promised from day
+                      one. With Gemma 3 27B, you get stronger reasoning, more
+                      detailed answers, and faster performance—all while keeping
+                      your data fully secure.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      The second major feature is the ability to upload images.
+                      For the first time, nilGPT can handle images as well as
+                      text. You can now upload screenshots, diagrams, or photos
+                      and interact with them directly in nilGPT.
+                    </p>
+                  </section>
+
+                  {/* More Improvements Section */}
+                  <section className="mb-8">
+                    <h2 className="font-display font-bold text-2xl text-navy-900 mb-4">
+                      More Improvements
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      Alongside these major features, we've added a set of
+                      smaller but useful improvements. You can now delete and
+                      rename chats, giving you more control over your chat
+                      history. On the landing page, a new counter shows the
+                      total number of messages sent with nilGPT since launch—a
+                      small but satisfying reminder of how quickly the community
+                      is growing.
+                    </p>
+
+                    {/* Message Counter Image */}
+                    <div className="my-8">
+                      <Image
+                        src="/img/message_counter.png"
+                        alt="nilGPT Message Counter"
+                        width={400}
+                        height={300}
+                        className="w-full max-w-md mx-auto h-auto border-2 border-navy-900 rounded-lg"
+                        priority
+                      />
+                    </div>
+
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      We've also introduced starter messages for each mode,
+                      designed to make it easier to get going with nilGPT right
+                      away.
+                    </p>
+
+                    {/* Starter Messages Image */}
+                    <div className="my-8">
+                      <Image
+                        src="/img/starter_messages.jpeg"
+                        alt="nilGPT Starter Messages"
+                        width={400}
+                        height={300}
+                        className="w-full max-w-md mx-auto h-auto border-2 border-navy-900 rounded-lg"
+                        priority
+                      />
+                    </div>
+                  </section>
+
+                  {/* Looking Ahead Section */}
+                  <section className="mb-8">
+                    <h2 className="font-display font-bold text-2xl text-navy-900 mb-4">
+                      Looking Ahead
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      In the near future, you will be able to search the web
+                      through nilGPT, extending the chatbot's knowledge base
+                      while still preserving the same guarantees of privacy and
+                      security.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      We're also working on voice mode, which will make
+                      conversations with nilGPT feel even more natural and
+                      seamless. The pace won't slow down.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed">
+                      Expect more exciting updates in the weeks ahead.
+                    </p>
+                  </section>
+                </div>
+
+                {/* Toggle Button */}
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setIsExpandedThird(!isExpandedThird)}
+                    className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
+                  >
+                    {isExpandedThird ? "Show Less" : "Read More"}
+                  </button>
+                </div>
+              </article>
+            </div>
+
+            {/* Second Article - Attestation Post */}
             <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
               <article className="space-y-8">
                 {/* Main Title */}
@@ -297,7 +445,7 @@ export default function ContentPolicy() {
               </article>
             </div>
 
-            {/* Second Article - Original Post */}
+            {/* Third Article - Original Post */}
             <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
               <article className="space-y-8">
                 {/* Main Title */}

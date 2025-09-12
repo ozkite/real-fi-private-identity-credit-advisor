@@ -44,8 +44,12 @@ export function SecretKeyModal({ isOpen, onClose }: SecretKeyModalProps) {
         </h2>
         <p className="text-gray-700 mb-6 leading-relaxed">
           Please create or enter your passphrase. This can be any word or
-          phrase, and is used to encrypt all chat messages locally. Your
-          passphrase never leaves your browser. <br />
+          phrase, and is used to encrypt all chat messages locally.
+          <br />
+          <br />
+          Your passphrase never leaves your browser - it is stored in session
+          storage and deleted if you close the tab.
+          <br />
           <br /> Keep your passphrase secure. You&apos;ll need to use the same
           one every time you want to view a chat.
         </p>
