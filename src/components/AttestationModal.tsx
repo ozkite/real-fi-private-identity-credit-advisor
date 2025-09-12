@@ -78,6 +78,18 @@ const AttestationModal = () => {
                   <code className="text-sm font-mono text-gray-600 bg-gray-100 px-1 py-0.5 rounded break-all">
                     https://nilgpt.xyz/nilcc/api/v1/report
                   </code>
+                  <Button
+                    onClick={() => getMeasurementHash()}
+                    disabled={isLoading}
+                    size="sm"
+                    className="flex items-center gap-2 ml-auto"
+                    data-umami-event="Fetch Attestation Clicked"
+                  >
+                    <RefreshCw
+                      className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                    />
+                    Fetch
+                  </Button>
                 </div>
               </div>
 
@@ -109,18 +121,6 @@ const AttestationModal = () => {
                   </div>
                 </div>
               )}
-              <Button
-                onClick={() => getMeasurementHash()}
-                disabled={isLoading}
-                size="sm"
-                className="flex items-center gap-2 ml-auto"
-                data-umami-event="Fetch Attestation Clicked"
-              >
-                <RefreshCw
-                  className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
-                />
-                Fetch
-              </Button>
             </div>
           </div>
         </div>

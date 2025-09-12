@@ -71,7 +71,7 @@ export default function AuthModal({
           {mode === "signup" && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name
+                Username
               </label>
               <input
                 type="text"
