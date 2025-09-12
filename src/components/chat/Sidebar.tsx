@@ -4,6 +4,9 @@ import {
   CheckIcon,
   EditIcon,
   EllipsisVertical,
+  LogOut,
+  Shield,
+  ShieldCheck,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
@@ -13,10 +16,12 @@ import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
 import AttestationModal from "../AttestationModal";
+import { SecretKeyModal } from "../auth/SecretKeyModal";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 
@@ -31,7 +36,8 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const { setUserSecretKeySeed } = useApp();
   const router = useRouter();
   const pathname = usePathname();
   const { decrypt, hasSecretKey } = useEncryption();
@@ -41,6 +47,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const [isAttestationModalOpen, setIsAttestationModalOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showSecretKeyModal, setShowSecretKeyModal] = useState(false);
   const [contextMenuChatId, setContextMenuChatId] = useState<string | null>(
     null,
   );
@@ -215,16 +223,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
       if (contextMenuChatId) {
         setContextMenuChatId(null);
       }
+      if (isUserMenuOpen) {
+        setIsUserMenuOpen(false);
+      }
     };
 
-    if (contextMenuChatId) {
+    if (contextMenuChatId || isUserMenuOpen) {
       document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [contextMenuChatId]);
+  }, [contextMenuChatId, isUserMenuOpen]);
 
   const handleNewChat = async () => {
     setIsCreatingChat(true);
@@ -328,6 +339,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const handleCancelRename = () => {
     setEditingChatId(null);
     setEditingTitle("");
+  };
+
+  // User menu handlers
+  const handleChangePassphrase = () => {
+    // Clear the current passphrase from both context and session storage
+    setUserSecretKeySeed("");
+    sessionStorage.removeItem("userSecretKeySeed");
+    // Open the modal
+    setShowSecretKeyModal(true);
+    setIsUserMenuOpen(false);
+  };
+
+  const handleViewAttestation = () => {
+    setIsAttestationModalOpen(true);
+    setIsUserMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsUserMenuOpen(false);
   };
 
   return (
@@ -534,15 +565,54 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           <AttestationModal />
         </Dialog>
 
-        <div className="border-t border-neutral-600 shrink-0 py-3 p-4 ">
+        <div className="border-t border-neutral-600 shrink-0 py-3 p-4 relative">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-[#FFC971] flex items-center justify-center text-sm font-medium text-black shrink-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsUserMenuOpen(!isUserMenuOpen);
+              }}
+              className="w-8 h-8 rounded-full bg-[#FFC971] flex items-center justify-center text-sm font-medium text-black shrink-0 hover:bg-[#FFD584] transition-colors"
+            >
               {initials}
-            </div>
+            </button>
             <span className="text-md text-white truncate">{userName}</span>
           </div>
+
+          {/* User Menu Dropdown */}
+          {isUserMenuOpen && (
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-[#2a2a2a] border border-[#444] rounded-lg shadow-lg z-50">
+              <button
+                onClick={handleChangePassphrase}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-[#333] rounded-t-lg transition-colors"
+              >
+                <Shield size={16} />
+                Change Passphrase
+              </button>
+              <button
+                onClick={handleViewAttestation}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-[#333] transition-colors"
+              >
+                <ShieldCheck size={16} />
+                View Attestation
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-[#333] rounded-b-lg transition-colors"
+              >
+                <LogOut size={16} />
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Secret Key Modal */}
+      <SecretKeyModal
+        isOpen={showSecretKeyModal}
+        onClose={() => setShowSecretKeyModal(false)}
+      />
     </div>
   );
 };

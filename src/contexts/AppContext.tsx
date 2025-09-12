@@ -70,6 +70,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (wasAuthenticated && !isCurrentlyAuthenticated) {
       setUserSecretKeySeed(null);
       sessionStorage.removeItem("userSecretKeySeed");
+      setIsSidebarCollapsed(true); // Collapse sidebar on sign out
     }
 
     // Update the previous state
