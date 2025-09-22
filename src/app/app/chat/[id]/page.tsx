@@ -152,8 +152,9 @@ export default function ChatPage({ params }: ChatPageProps) {
                   <button
                     onClick={handleUpdatePassphrase}
                     className="ml-4 px-4 py-2 bg-[#FFC971] text-black text-sm font-medium rounded-full hover:bg-[#FFD584] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFC971]"
+                    data-umami-event="Change Passphrase Clicked"
                   >
-                    Update Passphrase
+                    Change Passphrase
                   </button>
                 </div>
               </div>
