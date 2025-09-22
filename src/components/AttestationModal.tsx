@@ -41,7 +41,7 @@ const AttestationModal = () => {
         </DialogTitle>
       </DialogHeader>
 
-      <div className="space-y-8">
+      <div className="space-y-8 [&_a]:break-all">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-900 max-sm:text-base">
             A. Retrieve the attestation report from nilCC (TEE)
@@ -73,11 +73,15 @@ const AttestationModal = () => {
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
             <div className="space-y-3">
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">GET</span>
-                  <code className="text-sm font-mono text-gray-600 bg-gray-100 px-1 py-0.5 rounded break-all">
-                    https://nilgpt.xyz/nilcc/api/v1/report
-                  </code>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      GET
+                    </span>
+                    <code className="text-sm font-mono text-gray-600 bg-gray-100 px-1 py-0.5 rounded break-all">
+                      https://nilgpt.xyz/nilcc/api/v1/report
+                    </code>
+                  </div>
                   <Button
                     onClick={() => getMeasurementHash()}
                     disabled={isLoading}
