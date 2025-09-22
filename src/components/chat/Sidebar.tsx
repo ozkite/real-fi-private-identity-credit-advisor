@@ -22,8 +22,7 @@ import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
 import AttestationModal from "../AttestationModal";
 import { SecretKeyModal } from "../auth/SecretKeyModal";
-import { Button } from "../ui/button";
-import { Dialog, DialogTrigger } from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 
 interface ChatItem {
   _id: string;
@@ -551,7 +550,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           open={isAttestationModalOpen}
           onOpenChange={setIsAttestationModalOpen}
         >
-          <DialogTrigger asChild>
+          {/* TODO: Add back in when we allow logged out users to expand sidebar */}
+          {/* <DialogTrigger asChild>
             <Button
               variant="default"
               size="sm"
@@ -561,7 +561,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
               <span className="w-1.5 h-1.5 rounded-full bg-black" />
               <span className="text-sm text-black">View Attestation</span>
             </Button>
-          </DialogTrigger>
+          </DialogTrigger> */}
           <AttestationModal />
         </Dialog>
 
