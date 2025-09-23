@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { getUTMParametersForRegistration } from "@/utils/utmTracking";
 
@@ -12,9 +12,15 @@ export default function UserCreationHandler() {
   const { user } = useAuth();
   const hasAttemptedCreation = useRef(false);
 
+  // Create a stable user key that won't change unless the user actually changes
+  const userKey = useMemo(() => {
+    if (!user?.isAuthenticated || !user?.id) return null;
+    return `${user.id}-${user.isAuthenticated}`;
+  }, [user?.id, user?.isAuthenticated]);
+
   useEffect(() => {
     // Only run if user is authenticated and we haven't attempted creation yet
-    if (!user?.isAuthenticated || !user?.id || hasAttemptedCreation.current) {
+    if (!userKey || hasAttemptedCreation.current) {
       return;
     }
 
@@ -58,7 +64,7 @@ export default function UserCreationHandler() {
     const timeoutId = setTimeout(createUserInNilDB, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [user?.isAuthenticated, user?.id]);
+  }, [userKey, user?.id]);
 
   // This component doesn't render anything
   return null;

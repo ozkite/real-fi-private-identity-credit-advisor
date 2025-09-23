@@ -30,6 +30,17 @@ export const personas: Persona[] = [
         : "You are a compassionate AI Wellness Assistant created by Nillion.",
   },
   {
+    id: "relationship-advisor",
+    name: "Relationship Advisor",
+    description: "Kind, practical help with relationship challenges",
+    model: DEFAULT_MODEL,
+    systemPrompt:
+      process.env.SYSTEM_PROMPT &&
+      process.env.PERSONA_RELATIONSHIP_ADVISOR_PROMPT
+        ? `${process.env.SYSTEM_PROMPT} ${process.env.PERSONA_RELATIONSHIP_ADVISOR_PROMPT}`
+        : "You are a kind and practical AI Relationship Advisor created by Nillion.",
+  },
+  {
     id: "companion",
     name: "Companion",
     description: "Friendly conversational partner",

@@ -3,6 +3,7 @@ import { LOCAL_STORAGE_KEY_MAP } from "./constants";
 interface ChatItem {
   _id: string;
   title: string;
+  persona?: string;
 }
 
 export const LocalStorageService = {
