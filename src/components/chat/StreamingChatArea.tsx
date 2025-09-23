@@ -38,6 +38,11 @@ const getChatSuggestions = (persona: string): ChatSuggestion[] => {
       { emoji: "💤", text: "How can I sleep better?" },
       { emoji: "🧘", text: "Guide me through a meditation session" },
     ],
+    "relationship-advisor": [
+      { emoji: "💬", text: "Help me communicate with my partner" },
+      { emoji: "😰", text: "I feel insecure in my relationship" },
+      { emoji: "💕", text: "How can I grow closer to my partner?" },
+    ],
     companion: [
       { emoji: "👋", text: "Hey, how was your day?" },
       { emoji: "🃏", text: "Want to play a game?" },

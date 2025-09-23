@@ -23,4 +23,5 @@ export interface ChatMessage {
 export interface IChatItem {
   _id: string;
   title: string;
+  persona?: string;
 }

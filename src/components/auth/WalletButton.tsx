@@ -1,7 +1,6 @@
 import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { getUTMParametersForRegistration } from "@/utils/utmTracking";
+import { useEffect, useState } from "react";
 
 interface WalletButtonProps {
   onClose?: () => void;
@@ -15,50 +14,17 @@ function WalletButton({ onClose }: WalletButtonProps) {
 
   const disableLogin = !ready || (ready && authenticated) || isLoading;
 
-  const createUserInSecretVault = useCallback(async () => {
-    try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-
-      // Get UTM parameters for user registration
-      const utmParams = getUTMParametersForRegistration();
-      const requestBody =
-        Object.keys(utmParams).length > 0 ? { utm: utmParams } : {};
-
-      const response = await fetch("/api/createUser", {
-        method: "POST",
-        headers,
-        body:
-          Object.keys(requestBody).length > 0
-            ? JSON.stringify(requestBody)
-            : undefined,
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        onClose?.();
-
-        // Use a small delay to ensure modal closes before redirect
-        setTimeout(() => {
-          router.push("/app");
-        }, 100);
-      } else {
-        console.error("Error creating SecretVault user:", result.error);
-        onClose?.();
-      }
-    } catch (error) {
-      console.error("Network error creating SecretVault user:", error);
-      onClose?.();
-    }
-  }, [onClose, router]);
-
   useEffect(() => {
     if (authenticated && user && isLoading) {
-      createUserInSecretVault();
+      // UserCreationHandler will handle createUser call
+      // Just redirect to app page
+      onClose?.();
+      setTimeout(() => {
+        router.push("/app");
+      }, 100);
       setIsLoading(false);
     }
-  }, [authenticated, user, isLoading, createUserInSecretVault]);
+  }, [authenticated, user, isLoading, onClose, router]);
 
   const handleWalletLogin = async () => {
     if (disableLogin) return;

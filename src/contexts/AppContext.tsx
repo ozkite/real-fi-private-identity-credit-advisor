@@ -10,6 +10,8 @@ import {
   useState,
 } from "react";
 import type { IChatItem } from "@/types/chat";
+import { getPersonaFromUTM } from "@/utils/utmPersonaMapping";
+import { getStoredUTMParameters } from "@/utils/utmTracking";
 import { useAuth } from "./UnifiedAuthProvider";
 
 interface AppContextType {
@@ -47,6 +49,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const storedPassphrase = sessionStorage.getItem("userSecretKeySeed");
     if (storedPassphrase) {
       setUserSecretKeySeed(storedPassphrase);
+    }
+  }, []);
+
+  // Check UTM parameters and set persona accordingly (HIGHEST PRIORITY)
+  useEffect(() => {
+    const utmParams = getStoredUTMParameters();
+    const personaFromUTM = getPersonaFromUTM(utmParams);
+
+    if (personaFromUTM) {
+      console.log(
+        `UTM campaign detected: ${utmParams.utm_campaign}, setting persona to: ${personaFromUTM}`,
+      );
+      setSelectedPersona(personaFromUTM);
     }
   }, []);
 
