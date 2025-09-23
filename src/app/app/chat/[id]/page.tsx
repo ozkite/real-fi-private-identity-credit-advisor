@@ -122,6 +122,18 @@ export default function ChatPage({ params }: ChatPageProps) {
     );
   }
 
+  // If user is not authenticated, show loading instead of passphrase message
+  if (!user || !user.isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-full p-6">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"></div>
+          <p className="text-gray-600 text-center">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex flex-col h-full">
