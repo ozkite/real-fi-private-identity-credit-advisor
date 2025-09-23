@@ -1,8 +1,15 @@
+import { ChevronDown, Loader2, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { personas } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
+import useCreateChat from "@/hooks/useCreateChat";
 
 interface PersonaOption {
   id: string;
@@ -20,6 +27,7 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
   disabled = false,
 }) => {
   const { selectedPersona: selectedPersonaId, setSelectedPersona } = useApp();
+  const { createChat, isCreatingChat } = useCreateChat();
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedPersona =
@@ -53,42 +61,49 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="relative group">
-        <button
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors ${
-            disabled ? "cursor-not-allowed opacity-50" : ""
-          }`}
-          disabled={disabled}
-        >
-          <span className="text-sm font-medium truncate max-w-[160px] sm:max-w-[180px]">
-            {selectedPersona.name}
-          </span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-4 w-4 transition-transform flex-shrink-0 text-neutral-600 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
-
-        {disabled && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-            Create a new chat to change mode
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0"></div>
+      <HoverCard openDelay={100}>
+        <HoverCardTrigger tabIndex={0} asChild>
+          <div className="relative group">
+            <button
+              onClick={() => !disabled && setIsOpen(!isOpen)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors ${
+                disabled ? "opacity-50" : ""
+              }`}
+            >
+              <span className="text-sm font-medium truncate max-w-[160px] sm:max-w-[180px]">
+                {selectedPersona.name}
+              </span>
+              <ChevronDown
+                className={`transition-transform text-neutral-600 ${isOpen ? "rotate-180" : ""}`}
+                size={18}
+              />
+            </button>
           </div>
+        </HoverCardTrigger>
+        {disabled && (
+          <HoverCardContent className="w-auto p-4">
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-neutral-500">
+                Create a new chat to change mode
+              </p>
+              <button
+                className="bg-[#000201] hover:bg-[#000201]/80 transition-colors rounded-md px-4 py-2 flex items-center gap-2 justify-center"
+                onClick={() => createChat()}
+                disabled={isCreatingChat}
+              >
+                {isCreatingChat ? (
+                  <Loader2 className="animate-spin text-white" size={16} />
+                ) : (
+                  <>
+                    <span className="text-sm text-white">New Chat</span>
+                    <PlusIcon className="text-[#FFC971]" size={16} />
+                  </>
+                )}
+              </button>
+            </div>
+          </HoverCardContent>
         )}
-      </div>
+      </HoverCard>
 
       {isOpen && !disabled && (
         <div className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">

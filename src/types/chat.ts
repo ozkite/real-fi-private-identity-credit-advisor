@@ -19,3 +19,9 @@ export interface ChatMessage {
   content: string | IChatMessageContent[];
   attachments?: TMessageAttachment[];
 }
+
+export interface IChatItem {
+  _id: string;
+  title: string;
+  persona?: string;
+}
