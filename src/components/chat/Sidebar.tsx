@@ -15,19 +15,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
+import useCreateChat from "@/hooks/useCreateChat";
 import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
+import type { IChatItem } from "@/types/chat";
 import AttestationModal from "../AttestationModal";
 import { SecretKeyModal } from "../auth/SecretKeyModal";
 import { Dialog } from "../ui/dialog";
-
-interface ChatItem {
-  _id: string;
-  title: string;
-}
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -35,16 +31,16 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
-  const { user, signOut } = useAuth();
-  const { setUserSecretKeySeed } = useApp();
   const router = useRouter();
   const pathname = usePathname();
-  const { decrypt, hasSecretKey } = useEncryption();
-
   const currentChatId = pathname?.match(/\/app\/chat\/(.+)/)?.[1];
-  const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
+
+  const { user, signOut } = useAuth();
+  const { setUserSecretKeySeed, setChatHistory, chatHistory } = useApp();
+  const { decrypt, hasSecretKey } = useEncryption();
+  const { createChat, isCreatingChat } = useCreateChat();
+
   const [loading, setLoading] = useState(true);
-  const [isCreatingChat, setIsCreatingChat] = useState(false);
   const [isAttestationModalOpen, setIsAttestationModalOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showSecretKeyModal, setShowSecretKeyModal] = useState(false);
@@ -115,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
 
         setChatHistory((prev) => {
           const rawChats = (data.content.result || [])
-            .map((chat: ChatItem) => {
+            .map((chat: IChatItem) => {
               // Handle case where title might be an object (e.g., { '%allot': 'actual title' })
               let actualTitle = chat.title;
               if (typeof chat.title === "object" && chat.title !== null) {
@@ -136,14 +132,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
               };
             })
             .filter(
-              (c: ChatItem) => c.title && c.title !== "null" && c.title !== "",
+              (c: IChatItem) => c.title && c.title !== "null" && c.title !== "",
             );
 
           // Decrypt chat titles if user has secret key
           const processChats = async () => {
             if (hasSecretKey && rawChats.length > 0) {
               const decryptedChats = await Promise.all(
-                rawChats.map(async (chat: ChatItem) => {
+                rawChats.map(async (chat: IChatItem) => {
                   try {
                     const decryptedTitle = await decrypt(chat.title);
                     return {
@@ -164,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
 
           processChats().then((realChats) => {
             const realIds = new Set<string>(
-              realChats.map((c: ChatItem) => c._id),
+              realChats.map((c: IChatItem) => c._id),
             );
 
             if (!staleChatsRef.current) {
@@ -175,7 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
             setChatHistory(() => {
               const localChats = LocalStorageService.getChatHistory();
               const optimistic = localChats.filter(
-                (c: ChatItem) =>
+                (c: IChatItem) =>
                   !realIds.has(c._id) && c.title === "Untitled Chat",
               );
 
@@ -235,22 +231,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [contextMenuChatId, isUserMenuOpen]);
-
-  const handleNewChat = async () => {
-    setIsCreatingChat(true);
-    const newChat = { _id: uuidv4(), title: "Untitled Chat" };
-
-    // Optimistic update
-    setChatHistory((prev) => [newChat, ...prev]);
-
-    LocalStorageService.addChatToHistory(newChat);
-
-    router.push(`/app/chat/${newChat._id}`);
-
-    setTimeout(() => {
-      setIsCreatingChat(false);
-    }, 500);
-  };
 
   const handleDeleteChat = async (chatId: string) => {
     if (isDeleting) return;
@@ -410,7 +390,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
                   ? "opacity-50 cursor-not-allowed hover:bg-transparent"
                   : "hover:bg-[#333534]"
               }`}
-            onClick={() => handleNewChat()}
+            onClick={() => createChat()}
           >
             <div className="flex flex-row justify-between items-center  ">
               <div className="text-white text-center text-md ">New Chat</div>

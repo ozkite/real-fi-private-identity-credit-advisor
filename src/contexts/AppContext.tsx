@@ -2,11 +2,14 @@
 
 import {
   createContext,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
   useContext,
   useEffect,
   useState,
 } from "react";
+import type { IChatItem } from "@/types/chat";
 import { useAuth } from "./UnifiedAuthProvider";
 
 interface AppContextType {
@@ -19,6 +22,8 @@ interface AppContextType {
   setHasMessages: (hasMessages: boolean) => void;
   userSecretKeySeed: string | null;
   setUserSecretKeySeed: (key: string) => void;
+  chatHistory: IChatItem[];
+  setChatHistory: Dispatch<SetStateAction<IChatItem[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,6 +39,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [wasAuthenticated, setWasAuthenticated] = useState<boolean | null>(
     null,
   );
+
+  const [chatHistory, setChatHistory] = useState<IChatItem[]>([]);
 
   // Load passphrase from session storage on mount
   useEffect(() => {
@@ -87,6 +94,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setHasMessages,
     userSecretKeySeed,
     setUserSecretKeySeed: setUserSecretKeySeedWithStorage,
+    chatHistory,
+    setChatHistory,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

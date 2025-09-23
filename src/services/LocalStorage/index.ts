@@ -1,12 +1,8 @@
+import type { IChatItem } from "@/types/chat";
 import { LOCAL_STORAGE_KEY_MAP } from "./constants";
 
-interface ChatItem {
-  _id: string;
-  title: string;
-}
-
 export const LocalStorageService = {
-  getChatHistory: (): ChatItem[] => {
+  getChatHistory: (): IChatItem[] => {
     try {
       const data = localStorage.getItem(LOCAL_STORAGE_KEY_MAP.CHAT_HISTORY);
       return data ? JSON.parse(data) : [];
@@ -16,7 +12,7 @@ export const LocalStorageService = {
     }
   },
 
-  setChatHistory: (chatHistory: ChatItem[]): void => {
+  setChatHistory: (chatHistory: IChatItem[]): void => {
     try {
       localStorage.setItem(
         LOCAL_STORAGE_KEY_MAP.CHAT_HISTORY,
@@ -27,7 +23,7 @@ export const LocalStorageService = {
     }
   },
 
-  addChatToHistory: (chat: ChatItem): void => {
+  addChatToHistory: (chat: IChatItem): void => {
     const current = LocalStorageService.getChatHistory();
     LocalStorageService.setChatHistory([chat, ...current]);
   },
