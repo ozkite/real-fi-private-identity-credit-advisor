@@ -62,14 +62,13 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <HoverCard openDelay={100}>
-        <HoverCardTrigger asChild>
+        <HoverCardTrigger tabIndex={0} asChild>
           <div className="relative group">
             <button
               onClick={() => !disabled && setIsOpen(!isOpen)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors ${
-                disabled ? "cursor-not-allowed opacity-50" : ""
+                disabled ? "opacity-50" : ""
               }`}
-              disabled={disabled}
             >
               <span className="text-sm font-medium truncate max-w-[160px] sm:max-w-[180px]">
                 {selectedPersona.name}
@@ -93,7 +92,7 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
                 disabled={isCreatingChat}
               >
                 {isCreatingChat ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="animate-spin text-white" size={16} />
                 ) : (
                   <>
                     <span className="text-sm text-white">New Chat</span>
