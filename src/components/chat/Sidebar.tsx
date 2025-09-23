@@ -20,6 +20,8 @@ import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
+import { getPersonaFromUTM } from "@/utils/utmPersonaMapping";
+import { getStoredUTMParameters } from "@/utils/utmTracking";
 import AttestationModal from "../AttestationModal";
 import { SecretKeyModal } from "../auth/SecretKeyModal";
 import { Dialog } from "../ui/dialog";
@@ -27,6 +29,7 @@ import { Dialog } from "../ui/dialog";
 interface ChatItem {
   _id: string;
   title: string;
+  persona?: string;
 }
 
 interface SidebarProps {
@@ -36,7 +39,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const { user, signOut } = useAuth();
-  const { setUserSecretKeySeed } = useApp();
+  const { setUserSecretKeySeed, setSelectedPersona } = useApp();
   const router = useRouter();
   const pathname = usePathname();
   const { decrypt, hasSecretKey } = useEncryption();
@@ -179,7 +182,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
                   !realIds.has(c._id) && c.title === "Untitled Chat",
               );
 
-              return [...optimistic, ...realChats];
+              const finalChats = [...optimistic, ...realChats];
+
+              // Check if there's a UTM-based persona selection first (higher priority)
+              const utmParams = getStoredUTMParameters();
+              const personaFromUTM = getPersonaFromUTM(utmParams);
+
+              if (personaFromUTM) {
+                console.log(
+                  `UTM campaign detected, skipping latest chat persona selection`,
+                );
+              } else {
+                // Extract the latest persona from the most recent chat (fallback)
+                if (finalChats.length > 0) {
+                  const latestChat = finalChats[0]; // First chat is the most recent
+                  if (latestChat.persona) {
+                    // Set the persona in AppContext
+                    setSelectedPersona(latestChat.persona);
+                  }
+                }
+              }
+
+              return finalChats;
             });
           });
 
