@@ -32,7 +32,7 @@ export default function HomePage() {
     if (typeof window !== "undefined" && window.location.pathname === "/app") {
       const createAndRedirect = async () => {
         const newChatId = uuidv4();
-        router.replace(`/app/chat/${newChatId}`);
+        window.location.href = `/app/chat/${newChatId}`;
       };
 
       createAndRedirect();
