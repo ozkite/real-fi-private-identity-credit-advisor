@@ -151,11 +151,19 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
       return;
     }
 
-    // 3. Encrypt the title if user has secret key
+    // 3. Clean and encrypt the title if user has secret key
     let encryptedTitle = title;
     if (hasSecretKey && title) {
       try {
-        encryptedTitle = await encrypt(title);
+        // Clean the title more aggressively
+        const cleanedTitle = title
+          .trim() // Remove leading/trailing whitespace
+          .replace(/[\r\n\t]/g, " ") // Replace newlines, carriage returns, tabs with spaces
+          .replace(/\s+/g, " ") // Replace multiple spaces with single space
+          .replace(/[^\w\s\-]/g, "") // Remove special characters except letters, numbers, spaces, and hyphens
+          .trim() // Trim again after character removal
+          .substring(0, 100); // Limit to 100 characters max
+        encryptedTitle = await encrypt(cleanedTitle);
       } catch (error) {
         console.error("Error encrypting title:", error);
         encryptedTitle = title;
