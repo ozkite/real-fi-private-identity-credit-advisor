@@ -22,8 +22,7 @@ import { useEncryption } from "@/hooks/useEncryption";
 import { LocalStorageService } from "@/services/LocalStorage";
 import AttestationModal from "../AttestationModal";
 import { SecretKeyModal } from "../auth/SecretKeyModal";
-import { Button } from "../ui/button";
-import { Dialog, DialogTrigger } from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 
 interface ChatItem {
   _id: string;
@@ -551,17 +550,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
           open={isAttestationModalOpen}
           onOpenChange={setIsAttestationModalOpen}
         >
-          <DialogTrigger asChild>
+          {/* TODO: Add back in when we allow logged out users to expand sidebar */}
+          {/* <DialogTrigger asChild>
             <Button
               variant="default"
               size="sm"
               className="self-center bg-[#FFC971] rounded-full w-fit gap-2 px-4 my-4 hover:bg-[#FFC971]/90"
-              data-umami-event="Attestation Clicked"
+              data-umami-event="View Attestation Clicked"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-black" />
-              <span className="text-sm text-black">Attestation</span>
+              <span className="text-sm text-black">View Attestation</span>
             </Button>
-          </DialogTrigger>
+          </DialogTrigger> */}
           <AttestationModal />
         </Dialog>
 
@@ -585,6 +585,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
               <button
                 onClick={handleChangePassphrase}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-[#333] rounded-t-lg transition-colors"
+                data-umami-event="Change Passphrase Clicked"
               >
                 <Shield size={16} />
                 Change Passphrase
@@ -592,6 +593,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
               <button
                 onClick={handleViewAttestation}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-[#333] transition-colors"
+                data-umami-event="View Attestation Clicked"
               >
                 <ShieldCheck size={16} />
                 View Attestation
@@ -599,6 +601,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
               <button
                 onClick={handleSignOut}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-[#333] rounded-b-lg transition-colors"
+                data-umami-event="Sign Out Clicked"
               >
                 <LogOut size={16} />
                 Sign Out

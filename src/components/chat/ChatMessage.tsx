@@ -72,27 +72,31 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {message.content as string}
             </ReactMarkdown>
-            {isStreaming && !isUser && (
-              <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1 align-text-bottom" />
-            )}
           </div>
 
-          {!isUser && (
-            <div className="flex mt-2 space-x-2">
-              <button
-                onClick={() => copyToClipboard(message.content as string)}
-                className="p-1 text-neutral-500 hover:text-neutral-700"
-                title={isCopied ? "Copied!" : "Copy to clipboard"}
-              >
-                <Image
-                  src={isCopied ? "/img/tick_icon.svg" : "/img/copy-icon.png"}
-                  width={12}
-                  height={12}
-                  alt={isCopied ? "copied" : "copy-icon"}
-                />
-              </button>
-            </div>
-          )}
+          {!isUser &&
+            (isStreaming ? (
+              <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1 align-text-bottom" />
+            ) : (
+              message.content && (
+                <div className="flex mt-2 space-x-2">
+                  <button
+                    onClick={() => copyToClipboard(message.content as string)}
+                    className="p-1 text-neutral-500 hover:text-neutral-700"
+                    title={isCopied ? "Copied!" : "Copy to clipboard"}
+                  >
+                    <Image
+                      src={
+                        isCopied ? "/img/tick_icon.svg" : "/img/copy-icon.png"
+                      }
+                      width={12}
+                      height={12}
+                      alt={isCopied ? "copied" : "copy-icon"}
+                    />
+                  </button>
+                </div>
+              )
+            ))}
         </div>
       </div>
     </>
