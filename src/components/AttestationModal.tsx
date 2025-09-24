@@ -2,6 +2,7 @@ import { CheckCircle, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import useDeployedMeasurementHash from "@/hooks/useDeployedMeasurementHash";
 import useNilCCMeasurementHash from "@/hooks/useNilCCMeasurementHash";
+import API_ENDPOINTS from "@/services/API/constants";
 import { LINKS } from "../constants";
 import {
   Accordion,
@@ -54,15 +55,15 @@ const AttestationModal = () => {
               </AccordionTrigger>
               <AccordionContent className="p-0 mt-1">
                 <p className="text-xs text-gray-600">
-                  You can do this yourself by hex encoding report.measurement
+                  You can do this yourself by fetching the report.measurement
                   from{" "}
                   <a
-                    href="https://nilgpt.xyz/nilcc/api/v1/report"
+                    href={API_ENDPOINTS.NILCC_GENERATE_REPORT}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800 underline"
                   >
-                    https://nilgpt.xyz/nilcc/api/v1/report
+                    {API_ENDPOINTS.NILCC_GENERATE_REPORT}
                   </a>{" "}
                   .
                 </p>
@@ -79,7 +80,7 @@ const AttestationModal = () => {
                       GET
                     </span>
                     <code className="text-sm font-mono text-gray-600 bg-gray-100 px-1 py-0.5 rounded break-all">
-                      https://nilgpt.xyz/nilcc/api/v1/report
+                      {API_ENDPOINTS.NILCC_GENERATE_REPORT}
                     </code>
                   </div>
                   <Button

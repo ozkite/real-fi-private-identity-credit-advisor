@@ -1,5 +1,5 @@
 export interface INilCCReportGenerationResponse {
   report: {
-    measurement: number[];
+    measurement: string;
   };
 }
