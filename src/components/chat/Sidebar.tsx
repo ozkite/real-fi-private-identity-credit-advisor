@@ -184,21 +184,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
 
               const finalChats = [...optimistic, ...realChats];
 
-              // Check if there's a UTM-based persona selection first (higher priority)
-              const utmParams = getStoredUTMParameters();
-              const personaFromUTM = getPersonaFromUTM(utmParams);
+              if (!currentChatId) {
+                // Check if there's a UTM-based persona selection first (higher priority)
+                const utmParams = getStoredUTMParameters();
+                const personaFromUTM = getPersonaFromUTM(utmParams);
 
-              if (personaFromUTM) {
-                console.log(
-                  `UTM campaign detected, skipping latest chat persona selection`,
-                );
-              } else {
-                // Extract the latest persona from the most recent chat (fallback)
-                if (finalChats.length > 0) {
-                  const latestChat = finalChats[0]; // First chat is the most recent
-                  if (latestChat.persona) {
-                    // Set the persona in AppContext
-                    setSelectedPersona(latestChat.persona);
+                if (personaFromUTM) {
+                  console.log(
+                    `UTM campaign detected, skipping latest chat persona selection`,
+                  );
+                } else {
+                  // Extract the latest persona from the most recent chat (fallback)
+                  if (finalChats.length > 0) {
+                    const latestChat = finalChats[0]; // First chat is the most recent
+                    if (latestChat.persona) {
+                      // Set the persona in AppContext
+                      setSelectedPersona(latestChat.persona);
+                    }
                   }
                 }
               }

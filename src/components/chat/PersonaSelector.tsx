@@ -1,5 +1,6 @@
 import { ChevronDown, Loader2, PlusIcon } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -26,12 +27,36 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
   onPersonaChange,
   disabled = false,
 }) => {
-  const { selectedPersona: selectedPersonaId, setSelectedPersona } = useApp();
+  const {
+    selectedPersona: selectedPersonaId,
+    setSelectedPersona,
+    chatHistory,
+  } = useApp();
   const { createChat, isCreatingChat } = useCreateChat();
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
+  // Get current chat ID from pathname
+  const currentChatId = pathname?.match(/\/app\/chat\/(.+)/)?.[1];
+
+  // Determine which persona to show
+  const getCurrentPersona = () => {
+    // If we're in an existing chat, find the current chat's persona
+    if (currentChatId) {
+      const currentChat = chatHistory.find(
+        (chat) => chat._id === currentChatId,
+      );
+      if (currentChat?.persona) {
+        return currentChat.persona;
+      }
+    }
+    // Fall back to the selected persona from AppContext (for new chats)
+    return selectedPersonaId;
+  };
+
+  const currentPersonaId = getCurrentPersona();
   const selectedPersona =
-    personas.find((persona) => persona.id === selectedPersonaId) || personas[0];
+    personas.find((persona) => persona.id === currentPersonaId) || personas[0];
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -112,7 +137,7 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
               <button
                 key={persona.id}
                 className={`block w-full text-left px-4 py-3 text-sm hover:bg-neutral-50 ${
-                  selectedPersona.id === persona.id
+                  currentPersonaId === persona.id
                     ? "text-neutral-900 bg-neutral-50"
                     : "text-neutral-700"
                 }`}
@@ -125,7 +150,7 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
                       {persona.description}
                     </div>
                   </div>
-                  {selectedPersona.id === persona.id && (
+                  {currentPersonaId === persona.id && (
                     <Image
                       src="/img/tick_icon.svg"
                       alt="Selected"
