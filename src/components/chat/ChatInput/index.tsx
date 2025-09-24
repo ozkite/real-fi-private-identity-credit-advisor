@@ -10,16 +10,10 @@ import {
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
-import PersonaSelector from "./PersonaSelector";
+import PersonaSelector from "../PersonaSelector";
+import type { IChatInputProps } from "./types";
 
-interface ChatInputProps {
-  onSendMessage: (message: string, imageDataUrl?: string) => void;
-  isLoading: boolean;
-  placeholder?: string;
-  showActionButtons?: boolean;
-}
-
-const ChatInput: React.FC<ChatInputProps> = ({
+const ChatInput: React.FC<IChatInputProps> = ({
   onSendMessage,
   isLoading,
   placeholder = "What do you want to ask?",
@@ -98,7 +92,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
     e.preventDefault();
     if (!input.trim() || isLoading || !isAuthenticated || isOverLimit) return;
 
-    onSendMessage(input, filesContent?.[0]?.content);
+    onSendMessage({
+      content: input,
+      attachmentData: {
+        imageDataUrl: imageContent?.[0]?.content,
+      },
+    });
     setInput("");
     clearPickedFile();
   };

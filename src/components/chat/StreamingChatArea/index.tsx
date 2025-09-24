@@ -8,57 +8,21 @@ import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
 import useIsPWA from "@/hooks/useIsPWA";
 import { LocalStorageService } from "@/services/LocalStorage";
-import { useStreamingChat } from "../../hooks/useStreamingChat";
-import type { ChatMessage as MessageType } from "../../types/chat";
-import type { TMessageAttachment } from "../../types/schemas";
-import ChatInput from "./ChatInput";
-import ChatMessage from "./ChatMessage";
-
-interface StreamingChatAreaProps {
-  model: string;
-  initialMessages?: MessageType[];
-  chatId?: string | null;
-  hasDecryptionFailures?: boolean;
-}
-
-interface ChatSuggestion {
-  emoji: string;
-  text: string;
-}
-
-const getChatSuggestions = (persona: string): ChatSuggestion[] => {
-  const suggestions: Record<string, ChatSuggestion[]> = {
-    "personal-assistant": [
-      { emoji: "📅", text: "Help me plan my week" },
-      { emoji: "📧", text: "Draft an email for me" },
-      { emoji: "📝", text: "I need an agenda for my meeting" },
-    ],
-    "wellness-assistant": [
-      { emoji: "😌", text: "I'm feeling stressed..." },
-      { emoji: "💤", text: "How can I sleep better?" },
-      { emoji: "🧘", text: "Guide me through a meditation session" },
-    ],
-    "relationship-advisor": [
-      { emoji: "💬", text: "Help me communicate with my partner" },
-      { emoji: "😰", text: "I feel insecure in my relationship" },
-      { emoji: "💕", text: "How can I grow closer to my partner?" },
-    ],
-    companion: [
-      { emoji: "👋", text: "Hey, how was your day?" },
-      { emoji: "🃏", text: "Want to play a game?" },
-      { emoji: "🎬", text: "What movie would you recommend?" },
-    ],
-  };
-
-  return suggestions[persona] || suggestions.companion;
-};
+import { useStreamingChat } from "@/hooks/useStreamingChat";
+import type { IChatMessage } from "@/types/chat";
+import type { TMessageAttachment } from "@/types/schemas";
+import ChatInput from "../ChatInput";
+import ChatMessage from "../ChatMessage";
+import type { StreamingChatAreaProps } from "./types";
+import getPromptSuggestions from "@/utils/getPromptSuggestions";
+import type { ISendMessageParams } from "../ChatInput/types";
 
 const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
   initialMessages = [],
   chatId: initialChatId = null,
   hasDecryptionFailures = false,
 }) => {
-  const [messages, setMessages] = useState<MessageType[]>(initialMessages);
+  const [messages, setMessages] = useState<IChatMessage[]>(initialMessages);
   const [chatId, setChatId] = useState<string | null>(initialChatId);
   const [isUpdatingChat, setIsUpdatingChat] = useState(false);
   const chatIdRef = useRef<string | null>(initialChatId);
@@ -120,12 +84,12 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
   const updateChatTitle = async (
     chatIdToUpdate?: string,
-    conversationMessages?: MessageType[],
+    conversationMessages?: IChatMessage[],
   ) => {
     // 1. Call LLM Chat API for summary
     let title = null;
 
-    const summaryMessage: MessageType = {
+    const summaryMessage: IChatMessage = {
       role: "user",
       content: "Summarize this conversation in three words or less",
     };
@@ -340,7 +304,10 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     }
   }, [chatId, messages.length, scrollToBottom]);
 
-  const handleSendMessage = async (content: string, imageDataUrl?: string) => {
+  const handleSendMessage = async ({
+    content,
+    attachmentData,
+  }: ISendMessageParams) => {
     if (!user) {
       console.error("No authenticated user found");
       return;
@@ -348,11 +315,14 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
     if (!content.trim()) return;
 
-    const userMessage: MessageType = {
+    const userMessage: IChatMessage = {
       role: "user",
-      content: imageDataUrl
+      content: attachmentData?.imageDataUrl
         ? [
-            { type: "image_url", image_url: { url: imageDataUrl } },
+            {
+              type: "image_url",
+              image_url: { url: attachmentData.imageDataUrl },
+            },
             { type: "text", text: content },
           ]
         : content,
@@ -364,8 +334,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
             ?.text || "";
 
     let userMessageAttachments: TMessageAttachment[] | undefined;
-    if (imageDataUrl) {
-      userMessageAttachments = ["image"];
+    if (attachmentData?.imageDataUrl) {
+      userMessageAttachments?.push("image");
+    }
+    if (attachmentData?.pdfTextContent) {
+      userMessageAttachments?.push("pdf");
     }
 
     setMessages((prev) => [
@@ -379,7 +352,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
     setTimeout(() => scrollToBottom(true), 100);
 
-    const assistantMessage: MessageType = {
+    const assistantMessage: IChatMessage = {
       role: "assistant",
       content: "",
     };
@@ -439,7 +412,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
               try {
                 // Pass the current conversation including the user message and assistant response
-                const currentConversation: MessageType[] = [
+                const currentConversation: IChatMessage[] = [
                   ...messages,
                   {
                     role: "user" as const,
@@ -549,11 +522,13 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
             <div className="mt-8">
               <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
-                {getChatSuggestions(selectedPersona).map(
+                {getPromptSuggestions(selectedPersona).map(
                   (suggestion, index) => (
                     <button
                       key={index}
-                      onClick={() => handleSendMessage(suggestion.text)}
+                      onClick={() =>
+                        handleSendMessage({ content: suggestion.text })
+                      }
                       className="flex items-center space-x-2 p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-left group w-fit"
                     >
                       <div className="text-lg">{suggestion.emoji}</div>
