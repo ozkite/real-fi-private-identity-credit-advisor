@@ -48,7 +48,18 @@ export async function POST(request: NextRequest) {
       console.error("User doesn't exist, proceeding with creation", readError);
     }
 
-    const creationTime = new Date().toISOString();
+    // Create a predictable creation time rounded to the closest 5 minutes
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const roundedMinutes = Math.ceil(minutes / 5) * 5;
+    const creationTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      now.getHours(),
+      roundedMinutes,
+    );
+    const creationTimeString = creationTime.toISOString();
 
     // Get UTM parameters from request body if provided
     let utmData: USER_SCHEMA["utm"];
@@ -64,7 +75,7 @@ export async function POST(request: NextRequest) {
     const userData: USER_SCHEMA = {
       _id: recordId,
       provider: auth.authProvider,
-      created_at: creationTime,
+      created_at: creationTimeString,
       ...(utmData && { utm: utmData }),
     };
 
