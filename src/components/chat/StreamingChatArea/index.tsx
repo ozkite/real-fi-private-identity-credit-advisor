@@ -7,15 +7,15 @@ import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
 import useIsPWA from "@/hooks/useIsPWA";
-import { LocalStorageService } from "@/services/LocalStorage";
 import { useStreamingChat } from "@/hooks/useStreamingChat";
+import { LocalStorageService } from "@/services/LocalStorage";
 import type { IChatMessage } from "@/types/chat";
 import type { TMessageAttachment } from "@/types/schemas";
+import getPromptSuggestions from "@/utils/getPromptSuggestions";
 import ChatInput from "../ChatInput";
+import type { ISendMessageParams } from "../ChatInput/types";
 import ChatMessage from "../ChatMessage";
 import type { StreamingChatAreaProps } from "./types";
-import getPromptSuggestions from "@/utils/getPromptSuggestions";
-import type { ISendMessageParams } from "../ChatInput/types";
 
 const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
   initialMessages = [],
@@ -315,30 +315,29 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
     if (!content.trim()) return;
 
+    const userMessageContentText = content;
+    const userMessageAttachments: TMessageAttachment[] = [];
     const userMessage: IChatMessage = {
       role: "user",
-      content: attachmentData?.imageDataUrl
-        ? [
-            {
-              type: "image_url",
-              image_url: { url: attachmentData.imageDataUrl },
-            },
-            { type: "text", text: content },
-          ]
-        : content,
+      content,
     };
-    const userMessageContentText =
-      typeof userMessage.content === "string"
-        ? userMessage.content
-        : userMessage.content.find((content) => content.type === "text")
-            ?.text || "";
 
-    let userMessageAttachments: TMessageAttachment[] | undefined;
     if (attachmentData?.imageDataUrl) {
-      userMessageAttachments?.push("image");
+      userMessageAttachments.push("image");
+      userMessage.content = [
+        { type: "image_url", image_url: { url: attachmentData.imageDataUrl } },
+        { type: "text", text: content },
+      ];
     }
     if (attachmentData?.pdfTextContent) {
-      userMessageAttachments?.push("pdf");
+      userMessageAttachments.push("pdf");
+      userMessage.content = [
+        {
+          type: "text",
+          text: `This text extracted from a PDF file. Always refer to this text as an attached PDF file, do not refer to this as "provided text". ${attachmentData.pdfTextContent}`,
+        },
+        { type: "text", text: content },
+      ];
     }
 
     setMessages((prev) => [

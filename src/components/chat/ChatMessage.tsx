@@ -5,11 +5,11 @@ import type React from "react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { ChatMessage as MessageType } from "../../types/chat";
+import type { IChatMessage } from "../../types/chat";
 import getMessageAttachmentIcon from "../../utils/getMessageAttachmentIcon";
 
 interface ChatMessageProps {
-  message: MessageType;
+  message: IChatMessage;
   isStreaming?: boolean;
 }
 

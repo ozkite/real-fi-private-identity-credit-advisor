@@ -1,9 +1,16 @@
-import { FileIcon, ImageIcon, Mic, Paperclip } from "lucide-react";
+import {
+  FileIcon,
+  FileTextIcon,
+  ImageIcon,
+  Mic,
+  Paperclip,
+} from "lucide-react";
 import type { TMessageAttachment } from "../types/schemas";
 
+// TODO: Migrate to react-icons
 const AttachmentIcon: Record<TMessageAttachment, React.ElementType> = {
   image: ImageIcon,
-  pdf: FileIcon,
+  pdf: FileTextIcon,
   csv: FileIcon,
   audio: Mic,
 };

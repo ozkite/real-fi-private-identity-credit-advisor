@@ -17,7 +17,7 @@ export type IChatMessageContent = ITextContent | IImageContent;
 export interface IChatMessage {
   role: "user" | "assistant";
   content: string | IChatMessageContent[];
-  attachments?: TMessageAttachment[];
+  attachments?: TMessageAttachment[] | null;
 }
 
 export interface IChatItem {
