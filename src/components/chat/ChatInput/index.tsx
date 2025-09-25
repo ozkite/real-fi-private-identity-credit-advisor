@@ -58,7 +58,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
       );
 
       if (isFileSizeError) {
-        toast.warning("Image file size is too large");
+        toast.warning("We currently support images up to 5MB only");
       } else {
         toast.warning("Please select a valid single image file");
       }
