@@ -21,15 +21,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (!noTitle && title !== undefined) {
-      // Sanitize the title input
-      const sanitizedTitle = title
-        .toString()
-        .trim()
-        .slice(0, 100) // Limit to 100 characters
-        .replace(/[<>]/g, "") // Remove potential HTML tags
-        .replace(/[\r\n\t]/g, " "); // Replace line breaks and tabs with spaces
-
-      updateData.title = { "%allot": sanitizedTitle };
+      updateData.title = { "%allot": title };
     }
 
     const filter = { _id: _id };
