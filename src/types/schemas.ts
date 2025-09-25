@@ -9,6 +9,10 @@ export interface USER_SCHEMA {
     utm_term?: string;
     utm_content?: string;
   };
+  web_search?: {
+    date?: string;
+    counter?: number;
+  };
 }
 
 export interface CHAT_SCHEMA {

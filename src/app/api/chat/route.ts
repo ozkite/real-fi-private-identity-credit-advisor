@@ -1,5 +1,13 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { DEFAULT_MODEL, getPersonaPrompt } from "@/config/personas";
+import { requireAuth } from "@/lib/auth/unifiedAuth";
+import { setupClient } from "@/lib/nildb/setupClient";
+import {
+  checkWebSearchRateLimit,
+  incrementWebSearchCounterFromData,
+  resetWebSearchCounter,
+  WEB_SEARCH_DAILY_LIMIT,
+} from "@/lib/rateLimiting/webSearchRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +17,7 @@ export async function POST(req: Request) {
     const model = body.model || DEFAULT_MODEL;
     const persona = body.persona || "companion";
     const stream = body.stream !== false;
+    const webSearch = body.web_search === true; // Default to false if not provided
 
     const hasSystemMessage = body.messages.some(
       (msg: { role: string }) => msg.role === "system",
@@ -39,6 +48,59 @@ export async function POST(req: Request) {
       });
     }
 
+    // Handle web search rate limiting
+    let actualWebSearch = webSearch;
+    let rateLimitReached = false;
+
+    if (webSearch) {
+      try {
+        const auth = await requireAuth(req as NextRequest);
+        if (auth.isAuthenticated && auth.userId) {
+          const builder = await setupClient();
+
+          // Check rate limit
+          const userCollectionId = process.env.USER_COLLECTION_ID;
+          if (!userCollectionId) {
+            throw new Error(
+              "USER_COLLECTION_ID environment variable is not set",
+            );
+          }
+
+          const rateLimitCheck = await checkWebSearchRateLimit(
+            builder,
+            auth.userId,
+            userCollectionId,
+          );
+
+          // Reset counter if date has passed
+          if (rateLimitCheck.needsReset) {
+            await resetWebSearchCounter(builder, auth.userId, userCollectionId);
+          }
+
+          // Check if rate limit is reached
+          if (rateLimitCheck.isRateLimited) {
+            actualWebSearch = false;
+            rateLimitReached = true;
+          } else {
+            // Increment counter using the already fetched data
+            await incrementWebSearchCounterFromData(
+              builder,
+              auth.userId,
+              userCollectionId,
+              rateLimitCheck.webSearchData,
+            );
+          }
+        } else {
+          // If not authenticated, disable web search
+          actualWebSearch = false;
+        }
+      } catch (error) {
+        console.error("Error handling web search rate limiting:", error);
+        // On error, disable web search to be safe
+        actualWebSearch = false;
+      }
+    }
+
     const response = await fetch(
       `${process.env.NILAI_API_URL}/v1/chat/completions`,
       {
@@ -53,7 +115,7 @@ export async function POST(req: Request) {
           temperature: 0.2,
           stream: stream,
           max_tokens: 1100,
-          web_search: false,
+          web_search: actualWebSearch,
         }),
       },
     );
@@ -68,6 +130,13 @@ export async function POST(req: Request) {
 
     if (!stream) {
       const data = await response.json();
+
+      // Add rate limit information to response
+      if (rateLimitReached) {
+        data.rate_limit_reached = true;
+        data.rate_limit_message = `You have reached the daily limit of ${WEB_SEARCH_DAILY_LIMIT} web searches. Web search has been disabled for this request.`;
+      }
+
       return NextResponse.json(data);
     }
 
@@ -83,13 +152,22 @@ export async function POST(req: Request) {
 
     response.body.pipeThrough(transformStream);
 
+    const headers: Record<string, string> = {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    };
+
+    // Add rate limit information as headers for streaming responses
+    if (rateLimitReached) {
+      headers["X-Rate-Limit-Reached"] = "true";
+      headers["X-Rate-Limit-Message"] =
+        `You have reached the daily limit of ${WEB_SEARCH_DAILY_LIMIT} web searches. Web search has been disabled for this request.`;
+    }
+
     return new Response(transformStream.readable, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Transfer-Encoding": "chunked",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
+      headers,
     });
   } catch (error) {
     console.error("Chat error:", error);
