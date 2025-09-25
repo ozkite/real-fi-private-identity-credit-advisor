@@ -53,7 +53,45 @@ export async function checkWebSearchRateLimit(
       | { date?: string; counter?: number }
       | undefined;
     const webSearchDate = webSearchData?.date;
-    const webSearchCounter = webSearchData?.counter || 0;
+    const webSearchCounter = webSearchData?.counter;
+
+    // If web_search fields don't exist, initialize them
+    if (webSearchDate === undefined || webSearchCounter === undefined) {
+      try {
+        await updateRecord(
+          builder,
+          userCollectionId,
+          { _id: userId },
+          {
+            web_search: {
+              date: getTodayDateString(),
+              counter: 0,
+            },
+          },
+        );
+        // Return initialized state
+        return {
+          isRateLimited: false,
+          needsReset: false,
+          currentCount: 0,
+          webSearchData: { date: getTodayDateString(), counter: 0 },
+        };
+      } catch (error) {
+        console.error(
+          `User id "${userId}" couldn't be initialized in nilDB:`,
+          error,
+        );
+        // On error, allow the request (fail open)
+        return {
+          isRateLimited: false,
+          needsReset: false,
+          currentCount: 0,
+          webSearchData: undefined,
+        };
+      }
+    }
+
+    const currentCount = webSearchCounter || 0;
 
     // Check if date has passed (needs reset)
     const needsReset = webSearchDate ? !isToday(webSearchDate) : false;
@@ -63,18 +101,18 @@ export async function checkWebSearchRateLimit(
       return {
         isRateLimited: false,
         needsReset,
-        currentCount: webSearchCounter,
+        currentCount,
         webSearchData,
       };
     }
 
     // Check if current count has reached limit
-    const isRateLimited = webSearchCounter >= WEB_SEARCH_DAILY_LIMIT;
+    const isRateLimited = currentCount >= WEB_SEARCH_DAILY_LIMIT;
 
     return {
       isRateLimited,
       needsReset,
-      currentCount: webSearchCounter,
+      currentCount,
       webSearchData,
     };
   } catch (error) {
@@ -162,67 +200,5 @@ export async function incrementWebSearchCounterFromData(
       error,
     );
     // Don't throw - allow the request to proceed without incrementing
-  }
-}
-
-/**
- * Initialize web search fields for a user (used in getChats)
- */
-export async function initializeWebSearchFields(
-  builder: SecretVaultBuilderClient,
-  userId: string,
-  userCollectionId: string,
-): Promise<void> {
-  try {
-    const userResult = await getRecord(builder, userCollectionId, {
-      _id: userId,
-    });
-
-    if (!userResult.result || userResult.result.length === 0) {
-      // User not found, nothing to initialize
-      return;
-    }
-
-    const user = userResult.result[0];
-    const webSearchData = user.web_search as
-      | { date?: string; counter?: number }
-      | undefined;
-    const webSearchDate = webSearchData?.date;
-    const webSearchCounter = webSearchData?.counter;
-
-    // If fields don't exist, initialize them
-    if (webSearchDate === undefined || webSearchCounter === undefined) {
-      await updateRecord(
-        builder,
-        userCollectionId,
-        { _id: userId },
-        {
-          web_search: {
-            date: getTodayDateString(),
-            counter: 0,
-          },
-        },
-      );
-    } else if (webSearchDate && !isToday(webSearchDate)) {
-      // If date exists but is not today, reset counter
-      await updateRecord(
-        builder,
-        userCollectionId,
-        { _id: userId },
-        {
-          web_search: {
-            date: getTodayDateString(),
-            counter: 0,
-          },
-        },
-      );
-    }
-    // If date is today, do nothing (fields already exist and are current)
-  } catch (error) {
-    console.error(
-      `User id "${userId}" couldn't be fetched from nilDB for web search field initialization:`,
-      error,
-    );
-    // Don't throw - this is initialization, shouldn't break the main flow
   }
 }
