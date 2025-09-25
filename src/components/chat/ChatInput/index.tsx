@@ -1,4 +1,4 @@
-import { ImageIcon, XIcon } from "lucide-react";
+import { FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useFilePicker } from "use-file-picker";
@@ -10,34 +10,30 @@ import {
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
-import PersonaSelector from "./PersonaSelector";
+import getTextFromPdf from "@/utils/getTextFromPdf";
+import PersonaSelector from "../PersonaSelector";
+import type { IChatInputProps } from "./types";
 
-interface ChatInputProps {
-  onSendMessage: (message: string, imageDataUrl?: string) => void;
-  isLoading: boolean;
-  placeholder?: string;
-  showActionButtons?: boolean;
-}
-
-const ChatInput: React.FC<ChatInputProps> = ({
+const ChatInput: React.FC<IChatInputProps> = ({
   onSendMessage,
   isLoading,
   placeholder = "What do you want to ask?",
 }) => {
-  const [input, setInput] = useState("");
-  const [isMobile, setIsMobile] = useState(false);
-  const [wasLoading, setWasLoading] = useState(false);
   const { user } = useAuth();
   const isAuthenticated = !!user;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const { setSelectedPersona, hasMessages, selectedPersona } = useApp();
 
+  const [input, setInput] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+  const [wasLoading, setWasLoading] = useState(false);
+  const [pdfTextContent, setPdfTextContent] = useState<string | null>(null);
+
   const {
-    openFilePicker,
-    filesContent,
-    loading: isLoadingFilePicker,
-    clear: clearPickedFile,
+    openFilePicker: openImagePicker,
+    filesContent: imageContent,
+    loading: isLoadingImagePicker,
+    clear: clearPickedImage,
   } = useFilePicker({
     readAs: "DataURL",
     accept: "image/*",
@@ -57,13 +53,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
     ],
   });
 
-  const handlePersonaChange = (personaId: string) => {
-    setSelectedPersona(personaId);
-    window.umami.track("Mode Changed", {
-      from: getPersonaById(selectedPersona)?.name,
-      to: getPersonaById(personaId)?.name,
-    });
-  };
+  const {
+    openFilePicker: openPdfPicker,
+    filesContent: pdfContent,
+    loading: isLoadingPdfPicker,
+    clear: clearPickedPdf,
+  } = useFilePicker({
+    readAs: "ArrayBuffer",
+    accept: "application/pdf",
+    multiple: false,
+    validators: [
+      new FileAmountLimitValidator({ max: 1 }),
+      new FileTypeValidator(["pdf"]),
+      new FileSizeValidator({ maxFileSize: 10 * 1024 * 1024 }), // 10MB
+    ],
+  });
 
   // Mobile detection effect
   useEffect(() => {
@@ -83,6 +87,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
     setWasLoading(isLoading);
   }, [isLoading, wasLoading]);
 
+  useEffect(() => {
+    if (pdfContent.length > 0) {
+      getTextFromPdf(pdfContent[0].content)
+        .then((text) => setPdfTextContent(text))
+        .catch((error) => {
+          console.error("Error getting text from pdf:", error);
+          handleClearPickedPdf();
+        });
+    }
+  }, [pdfContent]);
+
   // Word count function
   const countWords = (text: string): number => {
     return text
@@ -94,13 +109,33 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const wordCount = countWords(input);
   const isOverLimit = wordCount > 600;
 
+  const handlePersonaChange = (personaId: string) => {
+    setSelectedPersona(personaId);
+    window.umami.track("Mode Changed", {
+      from: getPersonaById(selectedPersona)?.name,
+      to: getPersonaById(personaId)?.name,
+    });
+  };
+
+  const handleClearPickedPdf = () => {
+    setPdfTextContent(null);
+    clearPickedPdf();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading || !isAuthenticated || isOverLimit) return;
 
-    onSendMessage(input, filesContent?.[0]?.content);
+    onSendMessage({
+      content: input,
+      attachmentData: {
+        imageDataUrl: imageContent?.[0]?.content,
+        pdfTextContent,
+      },
+    });
     setInput("");
-    clearPickedFile();
+    clearPickedImage();
+    handleClearPickedPdf();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -111,14 +146,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
 
+  const areFilePickersLoading =
+    isLoading || isLoadingImagePicker || isLoadingPdfPicker || !isAuthenticated;
+
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit} className="relative flex flex-col">
         <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 p-4 pb-2">
-          {filesContent.length > 0 && (
+          {imageContent.length > 0 && (
             <div className="mb-2 relative flex self-end w-fit">
               <Image
-                src={filesContent[0].content}
+                src={imageContent[0].content}
                 width={100}
                 height={100}
                 alt=""
@@ -126,14 +164,30 @@ const ChatInput: React.FC<ChatInputProps> = ({
               />
               <button
                 type="button"
-                onClick={clearPickedFile}
+                onClick={clearPickedImage}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-1 -right-1 items-center"
               >
                 <XIcon size={12} />
               </button>
             </div>
           )}
-
+          {pdfTextContent && (
+            <div className="mb-2 relative flex self-end w-fit">
+              <div className="flex flex-col items-center gap-2 relative">
+                <FileTextIcon size={24} />
+                <span className="text-[6px] font-bold font-mono text-black bg-white absolute bottom-0 mx-auto">
+                  PDF
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleClearPickedPdf}
+                className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-2 -right-2.5 items-center"
+              >
+                <XIcon size={12} />
+              </button>
+            </div>
+          )}
           <div className="mb-2">
             <textarea
               ref={textareaRef}
@@ -142,9 +196,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={
-                isAuthenticated === false
-                  ? "Please sign in to chat."
-                  : placeholder
+                isAuthenticated ? placeholder : "Please sign in to chat."
               }
               className="w-full bg-transparent text-neutral-800 placeholder-neutral-400 resize-none focus:outline-none text-base leading-6 min-h-[36px] max-h-32 overflow-y-auto"
               style={{
@@ -160,7 +212,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                   Math.min(target.scrollHeight, 128),
                 )}px`;
               }}
-              disabled={isLoading || isAuthenticated === false}
+              disabled={isLoading || !isAuthenticated}
             />
             <style jsx>{`
               textarea::-webkit-scrollbar {
@@ -173,11 +225,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={openFilePicker}
-                disabled={isLoading || isLoadingFilePicker || !isAuthenticated}
+                onClick={openImagePicker}
+                disabled={areFilePickersLoading || pdfContent?.length > 0}
                 className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ImageIcon size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={openPdfPicker}
+                disabled={areFilePickersLoading || imageContent?.length > 0}
+                className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center flex-col relative"
+              >
+                <FileTextIcon size={18} />
+                <span className="text-[6px] font-bold font-mono text-black bg-white absolute bottom-0 right-0 left-0">
+                  PDF
+                </span>
               </button>
             </div>
 
