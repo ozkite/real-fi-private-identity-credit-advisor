@@ -35,19 +35,30 @@ export async function POST(request: NextRequest) {
 
     // Check if user already exists first
     try {
-      await getRecord(builder, process.env.USER_COLLECTION_ID, {
-        _id: recordId,
-      });
-      // User exists
-      return NextResponse.json({
-        success: true,
-        message: "User already exists",
-        provider: auth.authProvider,
-        userExists: true,
-      });
+      const userResult = await getRecord(
+        builder,
+        process.env.USER_COLLECTION_ID,
+        {
+          _id: recordId,
+        },
+      );
+
+      // Check if user was found
+      if (userResult.result && userResult.result.length > 0) {
+        // User exists
+        return NextResponse.json({
+          success: true,
+          message: "User already exists",
+          provider: auth.authProvider,
+          userExists: true,
+        });
+      }
+
+      // User not found, proceed with creation
+      console.log("User not found in nilDB, proceeding with creation");
     } catch (readError) {
-      // User doesn't exist, proceed with creation
-      console.error("User doesn't exist, proceeding with creation", readError);
+      // Proceed with creation if an error occurs during the getRecord call
+      console.error("Error checking if user exists:", readError);
     }
 
     // Create a predictable creation time rounded to the closest 5 minutes
