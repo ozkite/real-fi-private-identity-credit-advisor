@@ -1,6 +1,7 @@
 import { FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useFilePicker } from "use-file-picker";
 import {
   FileAmountLimitValidator,
@@ -51,6 +52,17 @@ const ChatInput: React.FC<IChatInputProps> = ({
       ]),
       new FileSizeValidator({ maxFileSize: 5 * 1024 * 1024 }), // 5MB
     ],
+    onFilesRejected: ({ errors }) => {
+      const isFileSizeError = errors.some(
+        (error) => error.name === "FileSizeError",
+      );
+
+      if (isFileSizeError) {
+        toast.warning("Image file size is too large");
+      } else {
+        toast.warning("Please select a valid single image file");
+      }
+    },
   });
 
   const {
@@ -67,6 +79,17 @@ const ChatInput: React.FC<IChatInputProps> = ({
       new FileTypeValidator(["pdf"]),
       new FileSizeValidator({ maxFileSize: 10 * 1024 * 1024 }), // 10MB
     ],
+    onFilesRejected: ({ errors }) => {
+      const isFileSizeError = errors.some(
+        (error) => error.name === "FileSizeError",
+      );
+
+      if (isFileSizeError) {
+        toast.warning("We currently support files up to 10MB only");
+      } else {
+        toast.warning("Please select a valid single PDF file");
+      }
+    },
   });
 
   // Mobile detection effect
@@ -92,6 +115,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
       getTextFromPdf(pdfContent[0].content)
         .then((text) => setPdfTextContent(text))
         .catch((error) => {
+          toast.error("Could not parse PDF, please try again");
           console.error("Error getting text from pdf:", error);
           handleClearPickedPdf();
         });
