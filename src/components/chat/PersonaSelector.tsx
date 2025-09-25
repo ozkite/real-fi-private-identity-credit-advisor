@@ -90,7 +90,14 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
         <HoverCardTrigger tabIndex={0} asChild>
           <div className="relative group">
             <button
-              onClick={() => !disabled && setIsOpen(!isOpen)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (disabled) {
+                  return;
+                }
+                setIsOpen(!isOpen);
+              }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors ${
                 disabled ? "opacity-50" : ""
               }`}
@@ -112,8 +119,12 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
                 Create a new chat to change mode
               </p>
               <button
+                type="button"
                 className="bg-[#000201] hover:bg-[#000201]/80 transition-colors rounded-md px-4 py-2 flex items-center gap-2 justify-center"
-                onClick={() => createChat()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  createChat();
+                }}
                 disabled={isCreatingChat}
               >
                 {isCreatingChat ? (
