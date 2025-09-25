@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
 
     // Check if user already exists first
     try {
-      await getRecord(builder, process.env.USER_COLLECTION_ID, recordId);
+      await getRecord(builder, process.env.USER_COLLECTION_ID, {
+        _id: recordId,
+      });
       // User exists
       return NextResponse.json({
         success: true,

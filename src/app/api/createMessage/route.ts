@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
       timestamp: timestamp,
       model: model,
       signature: "",
-      attachments,
       pwa,
+      ...(attachments?.length > 0 && { attachments }),
     };
 
     const builder = await setupClient();

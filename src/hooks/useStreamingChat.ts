@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type { ChatMessage } from "../types/chat";
+import type { IChatMessage } from "../types/chat";
 
 export interface UseStreamingChatOptions {
   onUpdate?: (content: string) => void;
@@ -13,7 +13,7 @@ export function useStreamingChat() {
 
   const sendMessage = useCallback(
     async (
-      messages: ChatMessage[],
+      messages: IChatMessage[],
       options: UseStreamingChatOptions = {},
       persona?: string,
     ): Promise<string> => {
