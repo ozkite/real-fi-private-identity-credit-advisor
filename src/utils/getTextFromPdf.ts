@@ -1,15 +1,9 @@
 "use client";
 
-import { pdfjs } from "react-pdf";
-
-if (typeof window !== "undefined") {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url,
-  ).toString();
-}
-
 const getTextFromPdf = async (pdfArrayBuffer: ArrayBuffer) => {
+  const pdfjs = await import("../services/Workers/PDFWorker").then(
+    (mod) => mod.default,
+  );
   const pdf = pdfjs.getDocument(pdfArrayBuffer);
 
   return pdf.promise
