@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const currentChatId = pathname?.match(/\/app\/chat\/(.+)/)?.[1];
 
   const { user, signOut } = useAuth();
-  const { decrypt, hasSecretKey } = useEncryption();
+  const { decrypt, encrypt, hasSecretKey } = useEncryption();
   const { createChat, isCreatingChat } = useCreateChat();
   const {
     setUserSecretKeySeed,
@@ -307,9 +307,35 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
   const handleSaveRename = async (chatId: string) => {
     if (isRenaming || !editingTitle.trim()) return;
 
+    // Check if title exceeds 50 character limit
+    if (editingTitle.trim().length > 50) {
+      console.warn(
+        "Title exceeds 50 character limit:",
+        editingTitle.trim().length,
+      );
+      return;
+    }
+
     setIsRenaming(true);
 
     try {
+      // Sanitize the title before encryption
+      const sanitizedTitle = editingTitle
+        .trim()
+        .replace(/[<>]/g, "") // Remove potential HTML tags
+        .replace(/[\r\n\t]/g, " "); // Replace line breaks and tabs with spaces
+
+      // Encrypt the title if user has secret key
+      let titleToSend = sanitizedTitle;
+      if (hasSecretKey) {
+        try {
+          titleToSend = await encrypt(sanitizedTitle);
+        } catch (error) {
+          console.error("Error encrypting title for rename:", error);
+          // Continue with unencrypted title if encryption fails
+        }
+      }
+
       const response = await fetch("/api/updateChat", {
         method: "POST",
         headers: {
@@ -317,22 +343,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
         },
         body: JSON.stringify({
           _id: chatId,
-          title: editingTitle.trim(),
+          title: titleToSend,
         }),
       });
 
       if (response.ok) {
-        // Update local state
+        // Update local state with the sanitized (unencrypted) title for display
         setChatHistory((prev) =>
           prev.map((chat) =>
-            chat._id === chatId
-              ? { ...chat, title: editingTitle.trim() }
-              : chat,
+            chat._id === chatId ? { ...chat, title: sanitizedTitle } : chat,
           ),
         );
 
-        // Update localStorage
-        LocalStorageService.updateChatTitle(chatId, editingTitle.trim());
+        // Update localStorage with the sanitized title
+        LocalStorageService.updateChatTitle(chatId, sanitizedTitle);
       } else {
         console.error("Failed to rename chat");
       }
@@ -464,41 +488,54 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onClose }) => {
                     }`}
                   >
                     {isEditing ? (
-                      <div className="flex-1 flex items-center">
-                        <input
-                          type="text"
-                          value={editingTitle}
-                          onChange={(e) => setEditingTitle(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleSaveRename(chat._id);
-                            } else if (e.key === "Escape") {
-                              handleCancelRename();
-                            }
-                          }}
-                          className="flex-1 bg-transparent text-white border border-[#555] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#FFC971] w-full"
-                          autoFocus
-                        />
-                        <div className="flex items-center ml-1">
-                          <button
-                            onClick={() => handleSaveRename(chat._id)}
-                            disabled={isRenaming}
-                            className="disabled:opacity-50 p-0.5"
-                          >
-                            <CheckIcon
-                              size={14}
-                              className="text-green-500 hover:text-green-300"
-                            />
-                          </button>
-                          <button
-                            onClick={handleCancelRename}
-                            className="p-0.5 ml-0.5"
-                          >
-                            <XIcon
-                              size={14}
-                              className="text-gray-400 hover:text-gray-300 "
-                            />
-                          </button>
+                      <div className="flex-1 flex flex-col">
+                        <div className="flex items-center">
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleSaveRename(chat._id);
+                              } else if (e.key === "Escape") {
+                                handleCancelRename();
+                              }
+                            }}
+                            className="flex-1 bg-transparent text-white border border-[#555] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#FFC971] w-full"
+                            maxLength={50}
+                            autoFocus
+                          />
+                          <div className="flex items-center ml-1">
+                            <button
+                              onClick={() => handleSaveRename(chat._id)}
+                              disabled={isRenaming || editingTitle.length > 50}
+                              className="disabled:opacity-50 p-0.5"
+                            >
+                              <CheckIcon
+                                size={14}
+                                className="text-green-500 hover:text-green-300"
+                              />
+                            </button>
+                            <button
+                              onClick={handleCancelRename}
+                              className="p-0.5 ml-0.5"
+                            >
+                              <XIcon
+                                size={14}
+                                className="text-gray-400 hover:text-gray-300 "
+                              />
+                            </button>
+                          </div>
+                        </div>
+                        <div
+                          className={`text-xs mt-1 ${editingTitle.length > 50 ? "text-red-400" : "text-gray-400"}`}
+                        >
+                          {editingTitle.length}/50
+                          {editingTitle.length > 50 && (
+                            <span className="ml-1 text-red-400">
+                              (Too long)
+                            </span>
+                          )}
                         </div>
                       </div>
                     ) : (
