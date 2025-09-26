@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import type { IChatMessage } from "../types/chat";
 
 export interface UseStreamingChatOptions {
+  shouldUseWebSearch?: boolean;
   onUpdate?: (content: string) => void;
   onComplete?: (content: string) => void;
   onError?: (error: string) => void;
@@ -17,7 +18,7 @@ export function useStreamingChat() {
       options: UseStreamingChatOptions = {},
       persona?: string,
     ): Promise<string> => {
-      const { onUpdate, onComplete, onError } = options;
+      const { onUpdate, onComplete, onError, shouldUseWebSearch } = options;
 
       setIsLoading(true);
       setIsStreaming(false);
@@ -32,6 +33,7 @@ export function useStreamingChat() {
             messages,
             stream: true,
             persona,
+            web_search: !!shouldUseWebSearch,
           }),
         });
 

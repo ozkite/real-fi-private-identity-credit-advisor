@@ -1,5 +1,6 @@
 export interface ISendMessageParams {
   content: string;
+  shouldUseWebSearch?: boolean;
   attachmentData?: {
     imageDataUrl?: string;
     pdfTextContent?: string | null;

@@ -306,6 +306,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
   const handleSendMessage = async ({
     content,
+    shouldUseWebSearch,
     attachmentData,
   }: ISendMessageParams) => {
     if (!user) {
@@ -361,6 +362,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
       await sendMessage(
         [...messages, userMessage],
         {
+          shouldUseWebSearch,
           onUpdate: (streamingContent) => {
             // Update the last message (assistant message) with streaming content
             setMessages((prev) => {

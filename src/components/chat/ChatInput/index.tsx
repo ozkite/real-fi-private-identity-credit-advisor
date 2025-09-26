@@ -1,6 +1,7 @@
 import { FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { TbWorldSearch } from "react-icons/tb";
 import { toast } from "sonner";
 import { useFilePicker } from "use-file-picker";
 import {
@@ -8,6 +9,12 @@ import {
   FileSizeValidator,
   FileTypeValidator,
 } from "use-file-picker/validators";
+import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
@@ -29,6 +36,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [wasLoading, setWasLoading] = useState(false);
   const [pdfTextContent, setPdfTextContent] = useState<string | null>(null);
+  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
 
   const {
     openFilePicker: openImagePicker,
@@ -152,6 +160,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
     onSendMessage({
       content: input,
+      shouldUseWebSearch: isWebSearchEnabled,
       attachmentData: {
         imageDataUrl: imageContent?.[0]?.content,
         pdfTextContent,
@@ -212,6 +221,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
               </button>
             </div>
           )}
+
           <div className="mb-2">
             <textarea
               ref={textareaRef}
@@ -268,8 +278,27 @@ const ChatInput: React.FC<IChatInputProps> = ({
               </button>
             </div>
 
-            {/* Right section - PersonaSelector + Send button */}
             <div className="flex items-center gap-1">
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger>
+                  <div className="flex items-center gap-0.5">
+                    <label
+                      htmlFor="web-search-switch"
+                      className="cursor-pointer"
+                    >
+                      <TbWorldSearch size={18} />
+                    </label>
+                    <Switch
+                      id="web-search-switch"
+                      checked={isWebSearchEnabled}
+                      onCheckedChange={setIsWebSearchEnabled}
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="text-neutral-500">
+                  Web search
+                </TooltipContent>
+              </Tooltip>
               <PersonaSelector
                 onPersonaChange={handlePersonaChange}
                 disabled={hasMessages}
