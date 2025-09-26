@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "sonner";
+
 const getTextFromPdf = async (pdfArrayBuffer: ArrayBuffer) => {
   const pdfjs = await import("../services/Workers/PDFWorker").then(
     (mod) => mod.default,
@@ -10,7 +12,8 @@ const getTextFromPdf = async (pdfArrayBuffer: ArrayBuffer) => {
     .then(async (pdf) => {
       const pages = pdf.numPages;
       if (pages > 100) {
-        throw new Error("PDF has too many pages");
+        toast.warning("We currently support up to 100 pages only");
+        return null;
       }
 
       let text = "";
