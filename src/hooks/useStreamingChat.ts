@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import type { IChatMessage } from "../types/chat";
+import type { IChatMessage, IWebSearchSource } from "../types/chat";
 
 export interface UseStreamingChatOptions {
   shouldUseWebSearch?: boolean;
   onUpdate?: (content: string) => void;
-  onComplete?: (content: string) => void;
+  onComplete?: (content: string, sources?: IWebSearchSource[]) => void;
   onError?: (error: string) => void;
 }
 
@@ -48,6 +48,7 @@ export function useStreamingChat() {
 
         const decoder = new TextDecoder();
         let accumulatedContent = "";
+        let webSearchSources: IWebSearchSource[] = [];
 
         setIsLoading(false);
         setIsStreaming(true);
@@ -75,10 +76,19 @@ export function useStreamingChat() {
                   const parsed = JSON.parse(jsonStr);
 
                   const content = parsed.choices?.[0]?.delta?.content || "";
+                  const sources = parsed.choices?.[0]?.delta?.sources || [];
 
                   if (content) {
                     accumulatedContent += content;
                     onUpdate?.(accumulatedContent);
+                  }
+
+                  if (sources) {
+                    webSearchSources = sources.map(
+                      (source: IWebSearchSource) => ({
+                        source: source.source,
+                      }),
+                    );
                   }
                 } catch (parseError) {
                   console.warn("Failed to parse streaming chunk:", parseError);
@@ -91,7 +101,7 @@ export function useStreamingChat() {
         }
 
         setIsStreaming(false);
-        onComplete?.(accumulatedContent);
+        onComplete?.(accumulatedContent, webSearchSources);
         return accumulatedContent;
       } catch (error) {
         setIsLoading(false);

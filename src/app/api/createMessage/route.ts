@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       blindfoldContent,
       attachments,
       pwa,
+      sources,
     } = body;
 
     if (!chat_id || !role || !blindfoldContent || order === undefined) {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
       signature: "",
       pwa,
       ...(attachments?.length > 0 && { attachments }),
+      ...(sources?.length > 0 && { sources }),
     };
 
     const builder = await setupClient();

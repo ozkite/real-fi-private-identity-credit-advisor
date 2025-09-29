@@ -9,7 +9,7 @@ import { useEncryption } from "@/hooks/useEncryption";
 import useIsPWA from "@/hooks/useIsPWA";
 import { useStreamingChat } from "@/hooks/useStreamingChat";
 import { LocalStorageService } from "@/services/LocalStorage";
-import type { IChatMessage } from "@/types/chat";
+import type { IChatMessage, IWebSearchSource } from "@/types/chat";
 import type { TMessageAttachment } from "@/types/schemas";
 import getPromptSuggestions from "@/utils/getPromptSuggestions";
 import ChatInput from "../ChatInput";
@@ -201,8 +201,9 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     content: string;
     order: number;
     attachments?: TMessageAttachment[];
+    sources?: IWebSearchSource[];
   }) => {
-    const { chatId, role, content, order, attachments } = message;
+    const { chatId, role, content, order, attachments, sources } = message;
 
     if (!user) {
       console.error("No authenticated user found");
@@ -236,6 +237,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
           creator: user?.id,
           blindfoldContent: blindfoldContent,
           attachments,
+          sources,
           ...(isPWA && { pwa: true }),
         }),
       });
@@ -374,13 +376,14 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
               return updated;
             });
           },
-          onComplete: async (finalContent) => {
+          onComplete: async (finalContent, sources) => {
             // Ensure final content is set
             setMessages((prev) => {
               const updated = [...prev];
               updated[updated.length - 1] = {
                 role: "assistant",
                 content: finalContent,
+                sources,
               };
               return updated;
             });
@@ -406,6 +409,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 role: "assistant",
                 content: finalContent,
                 order: 2,
+                sources,
               });
 
               // Update chat title immediately after first back and forth
@@ -420,7 +424,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                     content: userMessageContentText,
                     attachments: userMessageAttachments,
                   },
-                  { role: "assistant" as const, content: finalContent },
+                  {
+                    role: "assistant" as const,
+                    content: finalContent,
+                    sources,
+                  },
                 ];
                 await updateChatTitle(newChatId.message, currentConversation);
                 LocalStorageService.removeUntitledChats();
@@ -459,6 +467,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                         role: "assistant",
                         content: finalContent,
                         order: totalMessages,
+                        sources,
                       })
                     : Promise.resolve(),
                 ]);

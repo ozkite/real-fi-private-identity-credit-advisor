@@ -7,6 +7,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { IChatMessage } from "../../types/chat";
 import getMessageAttachmentIcon from "../../utils/getMessageAttachmentIcon";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
 
 interface ChatMessageProps {
   message: IChatMessage;
@@ -73,6 +78,47 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               {message.content as string}
             </ReactMarkdown>
           </div>
+
+          {message.sources && message.sources.length > 0 && (
+            <HoverCard openDelay={300}>
+              <HoverCardTrigger>
+                <span className="cursor-pointer text-neutral-500 text-sm hover:underline">
+                  Sources
+                </span>
+              </HoverCardTrigger>
+              <HoverCardContent align="start">
+                <div className="flex mt-2 space-x-2 flex-col">
+                  <span className="text-neutral-500 text-sm">
+                    Sources used to generate this response:
+                  </span>
+
+                  <ol className="list-decimal list-inside">
+                    {message.sources.map(({ source }) => {
+                      if (!source.startsWith("http")) {
+                        return null;
+                      }
+
+                      const sourceUrl = new URL(source);
+                      const sourceDomain = sourceUrl.hostname;
+                      return (
+                        <li key={source}>
+                          <a
+                            href={source}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <span className="text-neutral-500 text-sm hover:underline">
+                              {sourceDomain}
+                            </span>
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          )}
 
           {!isUser &&
             (isStreaming ? (
