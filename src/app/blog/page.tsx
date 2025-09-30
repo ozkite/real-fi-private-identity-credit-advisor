@@ -197,7 +197,7 @@ export default function ContentPolicy() {
               <article className="space-y-8">
                 {/* Main Title */}
                 <h1 className="font-display font-black text-3xl lg:text-4xl text-navy-900 mb-6">
-                  nilGPT: Towards Verifiable Trust
+                  nilGPT v3: Towards Verifiable Trust
                 </h1>
 
                 {/* Date */}
