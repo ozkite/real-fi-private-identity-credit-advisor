@@ -285,7 +285,13 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
             <div className="flex items-center gap-1">
               <Tooltip delayDuration={100}>
-                <TooltipTrigger>
+                <TooltipTrigger
+                  asChild
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
                   <div
                     className={`flex items-center gap-0.5 ${
                       isWebSearchDisabled ? "cursor-not-allowed" : ""
