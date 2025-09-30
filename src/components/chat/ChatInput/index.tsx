@@ -169,6 +169,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
       },
     });
     setInput("");
+    setIsWebSearchEnabled(false);
     clearPickedImage();
     handleClearPickedPdf();
   };
