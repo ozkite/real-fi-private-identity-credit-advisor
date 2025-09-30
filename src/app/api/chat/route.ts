@@ -117,7 +117,7 @@ export async function POST(req: Request) {
           stream: stream,
           web_search: actualWebSearch,
           temperature: modelConfig.temperature,
-          max_tokens: modelConfig.max_tokens,
+          max_tokens: modelConfig.maxTokens,
         }),
       },
     );

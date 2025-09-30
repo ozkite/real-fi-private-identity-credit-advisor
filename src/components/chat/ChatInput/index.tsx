@@ -161,7 +161,10 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
     onSendMessage({
       content: input,
-      model: imageContent?.[0]?.content ? LLM.gemma.model : DEFAULT_MODEL,
+      model:
+        imageContent?.[0]?.content || selectedPersona === "companion"
+          ? LLM.gemma.model
+          : DEFAULT_MODEL,
       shouldUseWebSearch: isWebSearchEnabled,
       attachmentData: {
         imageDataUrl: imageContent?.[0]?.content,
