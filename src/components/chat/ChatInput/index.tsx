@@ -1,7 +1,6 @@
-import { FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { TbWorldSearch } from "react-icons/tb";
+import { TbFileTypePdf, TbPhoto, TbWorldSearch, TbX } from "react-icons/tb";
 import { toast } from "sonner";
 import { useFilePicker } from "use-file-picker";
 import {
@@ -205,24 +204,19 @@ const ChatInput: React.FC<IChatInputProps> = ({
                 onClick={clearPickedImage}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-1 -right-1 items-center"
               >
-                <XIcon size={12} />
+                <TbX size={12} />
               </button>
             </div>
           )}
           {pdfTextContent && (
             <div className="mb-2 relative flex self-end w-fit">
-              <div className="flex flex-col items-center gap-2 relative">
-                <FileTextIcon size={24} />
-                <span className="text-[6px] font-bold font-mono text-black bg-white absolute bottom-0 mx-auto">
-                  PDF
-                </span>
-              </div>
+              <TbFileTypePdf size={24} />
               <button
                 type="button"
                 onClick={handleClearPickedPdf}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-2 -right-2.5 items-center"
               >
-                <XIcon size={12} />
+                <TbX size={12} />
               </button>
             </div>
           )}
@@ -268,18 +262,15 @@ const ChatInput: React.FC<IChatInputProps> = ({
                 disabled={areFilePickersLoading || pdfContent?.length > 0}
                 className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ImageIcon size={18} />
+                <TbPhoto size={18} />
               </button>
               <button
                 type="button"
                 onClick={openPdfPicker}
                 disabled={areFilePickersLoading || imageContent?.length > 0}
-                className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center flex-col relative"
+                className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FileTextIcon size={18} />
-                <span className="text-[6px] font-bold font-mono text-black bg-white absolute bottom-0 right-0 left-0">
-                  PDF
-                </span>
+                <TbFileTypePdf size={18} />
               </button>
             </div>
 

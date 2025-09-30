@@ -64,7 +64,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               const AttachmentIcon = getMessageAttachmentIcon(attachment);
               return (
                 <div key={attachment}>
-                  <AttachmentIcon size={12} className="text-neutral-500" />
+                  <AttachmentIcon size={14} className="text-neutral-500" />
                 </div>
               );
             })}
