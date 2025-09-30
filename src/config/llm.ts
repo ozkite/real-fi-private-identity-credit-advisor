@@ -3,7 +3,7 @@ export const LLM = {
     class: "gemma",
     model: "google/gemma-3-27b-it",
     temperature: 0.2,
-    maxTokens: 1100,
+    maxTokens: 10000,
     infoLink: "https://huggingface.co/google/gemma-3-27b-it",
     nilAIInstance: process.env.NILAI_API_URL,
   },
