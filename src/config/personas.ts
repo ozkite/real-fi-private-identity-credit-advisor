@@ -1,3 +1,5 @@
+import { DEFAULT_MODEL } from "./llm";
+
 export interface Persona {
   id: string;
   name: string;
@@ -5,8 +7,6 @@ export interface Persona {
   systemPrompt: string;
   model: string;
 }
-
-export const DEFAULT_MODEL = "google/gemma-3-27b-it";
 
 export const personas: Persona[] = [
   {

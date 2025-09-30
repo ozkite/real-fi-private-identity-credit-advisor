@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { DEFAULT_MODEL, getPersonaPrompt } from "@/config/personas";
+import { DEFAULT_MODEL, getModelConfig, type TLLMName } from "@/config/llm";
+import { getPersonaPrompt } from "@/config/personas";
 import { requireAuth } from "@/lib/auth/unifiedAuth";
 import { setupClient } from "@/lib/nildb/setupClient";
 import {
@@ -14,7 +15,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const model = body.model || DEFAULT_MODEL;
+    const model: TLLMName = body.model || DEFAULT_MODEL;
     const persona = body.persona || "companion";
     const stream = body.stream !== false;
     const webSearch = body.web_search === true; // Default to false if not provided
@@ -101,8 +102,9 @@ export async function POST(req: Request) {
       }
     }
 
+    const modelConfig = getModelConfig(model);
     const response = await fetch(
-      `${process.env.NILAI_API_URL}/v1/chat/completions`,
+      `${modelConfig.nilAIInstance}/v1/chat/completions`,
       {
         method: "POST",
         headers: {
@@ -112,10 +114,10 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           model: model,
           messages: messages,
-          temperature: 0.2,
           stream: stream,
-          max_tokens: 1100,
           web_search: actualWebSearch,
+          temperature: modelConfig.temperature,
+          max_tokens: modelConfig.max_tokens,
         }),
       },
     );

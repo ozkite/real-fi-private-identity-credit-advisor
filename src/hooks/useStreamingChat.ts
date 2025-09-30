@@ -1,7 +1,9 @@
 import { useCallback, useState } from "react";
+import type { TLLMName } from "@/config/llm";
 import type { IChatMessage, IWebSearchSource } from "../types/chat";
 
 export interface UseStreamingChatOptions {
+  model?: TLLMName;
   shouldUseWebSearch?: boolean;
   onUpdate?: (content: string) => void;
   onComplete?: (content: string, sources?: IWebSearchSource[]) => void;
@@ -18,7 +20,8 @@ export function useStreamingChat() {
       options: UseStreamingChatOptions = {},
       persona?: string,
     ): Promise<string> => {
-      const { onUpdate, onComplete, onError, shouldUseWebSearch } = options;
+      const { onUpdate, onComplete, onError, shouldUseWebSearch, model } =
+        options;
 
       setIsLoading(true);
       setIsStreaming(false);
@@ -34,6 +37,7 @@ export function useStreamingChat() {
             stream: true,
             persona,
             web_search: !!shouldUseWebSearch,
+            model,
           }),
         });
 

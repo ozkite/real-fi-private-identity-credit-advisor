@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DEFAULT_MODEL, LLM } from "@/config/llm";
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
@@ -161,6 +162,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
     onSendMessage({
       content: input,
+      model: imageContent?.[0]?.content ? LLM.gemma.model : DEFAULT_MODEL,
       shouldUseWebSearch: isWebSearchEnabled,
       attachmentData: {
         imageDataUrl: imageContent?.[0]?.content,

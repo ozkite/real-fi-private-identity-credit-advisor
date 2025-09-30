@@ -2,7 +2,8 @@
 
 import { RefreshCwIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DEFAULT_MODEL, getPersonaById } from "@/config/personas";
+import { DEFAULT_MODEL } from "@/config/llm";
+import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
 import { useEncryption } from "@/hooks/useEncryption";
@@ -308,6 +309,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
 
   const handleSendMessage = async ({
     content,
+    model,
     shouldUseWebSearch,
     attachmentData,
   }: ISendMessageParams) => {
@@ -364,6 +366,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
       await sendMessage(
         [...messages, userMessage],
         {
+          model,
           shouldUseWebSearch,
           onUpdate: (streamingContent) => {
             // Update the last message (assistant message) with streaming content
