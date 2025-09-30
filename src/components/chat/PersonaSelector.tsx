@@ -86,7 +86,7 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <HoverCard openDelay={100}>
+      <HoverCard openDelay={500}>
         <HoverCardTrigger tabIndex={0} asChild>
           <div className="relative group">
             <button

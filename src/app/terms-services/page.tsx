@@ -1,9 +1,8 @@
 "use client";
 
-/* eslint-disable react/no-unescaped-entities */
-
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { LLM } from "@/config/llm";
 
 export default function TermsOfService() {
   return (
@@ -131,16 +130,13 @@ export default function TermsOfService() {
                 </p>
                 <ol className="list-decimal list-inside text-navy-700 space-y-2 mb-4">
                   <li>
-                    google/gemma-3-27b-it:
-                    https://huggingface.co/google/gemma-3-27b-it
+                    {LLM.gemma.model}: {LLM.gemma.infoLink}
                   </li>
                   <li>
-                    meta-llama/Llama-3.1-8B:
-                    https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+                    {LLM.llama.model}: {LLM.llama.infoLink}
                   </li>
                   <li>
-                    openai/gpt-oss-20b:
-                    https://huggingface.co/openai/gpt-oss-20b
+                    {LLM.gpt.model}: {LLM.gpt.infoLink}
                   </li>
                 </ol>
               </section>

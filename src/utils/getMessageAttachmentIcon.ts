@@ -1,23 +1,22 @@
 import {
-  FileIcon,
-  FileTextIcon,
-  ImageIcon,
-  Mic,
-  Paperclip,
-} from "lucide-react";
+  TbFileTypeCsv,
+  TbFileTypePdf,
+  TbMicrophone,
+  TbPaperclip,
+  TbPhoto,
+} from "react-icons/tb";
 import type { TMessageAttachment } from "../types/schemas";
 
-// TODO: Migrate to react-icons
 const AttachmentIcon: Record<TMessageAttachment, React.ElementType> = {
-  image: ImageIcon,
-  pdf: FileTextIcon,
-  csv: FileIcon,
-  audio: Mic,
+  image: TbPhoto,
+  pdf: TbFileTypePdf,
+  csv: TbFileTypeCsv,
+  audio: TbMicrophone,
 };
 
 const getMessageAttachmentIcon = (attachment: TMessageAttachment) => {
   if (!AttachmentIcon[attachment]) {
-    return Paperclip;
+    return TbPaperclip;
   }
 
   return AttachmentIcon[attachment];

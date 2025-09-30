@@ -1,9 +1,13 @@
 import { useCallback, useState } from "react";
-import type { IChatMessage } from "../types/chat";
+import { toast } from "sonner";
+import type { TLLMName } from "@/config/llm";
+import type { IChatMessage, IWebSearchSource } from "../types/chat";
 
 export interface UseStreamingChatOptions {
+  model?: TLLMName;
+  shouldUseWebSearch?: boolean;
   onUpdate?: (content: string) => void;
-  onComplete?: (content: string) => void;
+  onComplete?: (content: string, sources?: IWebSearchSource[]) => void;
   onError?: (error: string) => void;
 }
 
@@ -17,7 +21,8 @@ export function useStreamingChat() {
       options: UseStreamingChatOptions = {},
       persona?: string,
     ): Promise<string> => {
-      const { onUpdate, onComplete, onError } = options;
+      const { onUpdate, onComplete, onError, shouldUseWebSearch, model } =
+        options;
 
       setIsLoading(true);
       setIsStreaming(false);
@@ -32,6 +37,8 @@ export function useStreamingChat() {
             messages,
             stream: true,
             persona,
+            web_search: !!shouldUseWebSearch,
+            model,
           }),
         });
 
@@ -46,6 +53,7 @@ export function useStreamingChat() {
 
         const decoder = new TextDecoder();
         let accumulatedContent = "";
+        let webSearchSources: IWebSearchSource[] = [];
 
         setIsLoading(false);
         setIsStreaming(true);
@@ -73,10 +81,19 @@ export function useStreamingChat() {
                   const parsed = JSON.parse(jsonStr);
 
                   const content = parsed.choices?.[0]?.delta?.content || "";
+                  const sources = parsed.choices?.[0]?.delta?.sources || [];
 
                   if (content) {
                     accumulatedContent += content;
                     onUpdate?.(accumulatedContent);
+                  }
+
+                  if (sources) {
+                    webSearchSources = sources.map(
+                      (source: IWebSearchSource) => ({
+                        source: source.source,
+                      }),
+                    );
                   }
                 } catch (parseError) {
                   console.warn("Failed to parse streaming chunk:", parseError);
@@ -85,11 +102,18 @@ export function useStreamingChat() {
             }
           }
         } finally {
+          const rateLimitReached = response.headers.get("X-Rate-Limit-Reached");
+          if (rateLimitReached === "true") {
+            toast.info(
+              "You have reached the daily limit for web search. Your prompt was routed to the model without web search.",
+              { duration: 8000 },
+            );
+          }
           reader.releaseLock();
         }
 
         setIsStreaming(false);
-        onComplete?.(accumulatedContent);
+        onComplete?.(accumulatedContent, webSearchSources);
         return accumulatedContent;
       } catch (error) {
         setIsLoading(false);

@@ -14,10 +14,14 @@ export interface IImageContent {
 
 export type IChatMessageContent = ITextContent | IImageContent;
 
+export interface IWebSearchSource {
+  source: string;
+}
 export interface IChatMessage {
   role: "user" | "assistant";
   content: string | IChatMessageContent[];
   attachments?: TMessageAttachment[] | null;
+  sources?: IWebSearchSource[] | null;
 }
 
 export interface IChatItem {

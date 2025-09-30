@@ -1,6 +1,6 @@
-import { FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { TbFileTypePdf, TbPhoto, TbWorldSearch, TbX } from "react-icons/tb";
 import { toast } from "sonner";
 import { useFilePicker } from "use-file-picker";
 import {
@@ -8,6 +8,13 @@ import {
   FileSizeValidator,
   FileTypeValidator,
 } from "use-file-picker/validators";
+import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { DEFAULT_MODEL, LLM } from "@/config/llm";
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/UnifiedAuthProvider";
@@ -29,6 +36,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [wasLoading, setWasLoading] = useState(false);
   const [pdfTextContent, setPdfTextContent] = useState<string | null>(null);
+  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
 
   const {
     openFilePicker: openImagePicker,
@@ -52,6 +60,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
       ]),
       new FileSizeValidator({ maxFileSize: 5 * 1024 * 1024 }), // 5MB
     ],
+    onFilesSuccessfullySelected: () => setIsWebSearchEnabled(false),
     onFilesRejected: ({ errors }) => {
       const isFileSizeError = errors.some(
         (error) => error.name === "FileSizeError",
@@ -152,12 +161,18 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
     onSendMessage({
       content: input,
+      model:
+        imageContent?.[0]?.content || selectedPersona === "companion"
+          ? LLM.gemma.model
+          : DEFAULT_MODEL,
+      shouldUseWebSearch: isWebSearchEnabled,
       attachmentData: {
         imageDataUrl: imageContent?.[0]?.content,
         pdfTextContent,
       },
     });
     setInput("");
+    setIsWebSearchEnabled(false);
     clearPickedImage();
     handleClearPickedPdf();
   };
@@ -172,6 +187,8 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
   const areFilePickersLoading =
     isLoading || isLoadingImagePicker || isLoadingPdfPicker || !isAuthenticated;
+  const isWebSearchDisabled =
+    isLoading || !isAuthenticated || imageContent.length > 0;
 
   return (
     <div className="w-full">
@@ -191,27 +208,23 @@ const ChatInput: React.FC<IChatInputProps> = ({
                 onClick={clearPickedImage}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-1 -right-1 items-center"
               >
-                <XIcon size={12} />
+                <TbX size={12} />
               </button>
             </div>
           )}
           {pdfTextContent && (
             <div className="mb-2 relative flex self-end w-fit">
-              <div className="flex flex-col items-center gap-2 relative">
-                <FileTextIcon size={24} />
-                <span className="text-[6px] font-bold font-mono text-black bg-white absolute bottom-0 mx-auto">
-                  PDF
-                </span>
-              </div>
+              <TbFileTypePdf size={24} />
               <button
                 type="button"
                 onClick={handleClearPickedPdf}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-2 -right-2.5 items-center"
               >
-                <XIcon size={12} />
+                <TbX size={12} />
               </button>
             </div>
           )}
+
           <div className="mb-2">
             <textarea
               ref={textareaRef}
@@ -253,23 +266,54 @@ const ChatInput: React.FC<IChatInputProps> = ({
                 disabled={areFilePickersLoading || pdfContent?.length > 0}
                 className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ImageIcon size={18} />
+                <TbPhoto size={18} />
               </button>
               <button
                 type="button"
                 onClick={openPdfPicker}
                 disabled={areFilePickersLoading || imageContent?.length > 0}
-                className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center flex-col relative"
+                className="outline-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FileTextIcon size={18} />
-                <span className="text-[6px] font-bold font-mono text-black bg-white absolute bottom-0 right-0 left-0">
-                  PDF
-                </span>
+                <TbFileTypePdf size={18} />
               </button>
             </div>
 
-            {/* Right section - PersonaSelector + Send button */}
             <div className="flex items-center gap-1">
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger
+                  asChild
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <div
+                    className={`flex items-center gap-0.5 ${
+                      isWebSearchDisabled ? "cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <label htmlFor="web-search-switch">
+                      <TbWorldSearch
+                        size={18}
+                        className={
+                          isWebSearchDisabled
+                            ? "cursor-not-allowed opacity-50"
+                            : "cursor-pointer"
+                        }
+                      />
+                    </label>
+                    <Switch
+                      id="web-search-switch"
+                      checked={isWebSearchEnabled}
+                      onCheckedChange={setIsWebSearchEnabled}
+                      disabled={isWebSearchDisabled}
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="text-neutral-500">
+                  Web search
+                </TooltipContent>
+              </Tooltip>
               <PersonaSelector
                 onPersonaChange={handlePersonaChange}
                 disabled={hasMessages}

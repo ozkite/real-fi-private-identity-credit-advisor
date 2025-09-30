@@ -5,6 +5,7 @@ export async function updateRecord(
   collectionId: string | undefined,
   filter: Record<string, unknown>,
   updatedData: Record<string, unknown>,
+  operator: string = "$set",
 ): Promise<{ status: string; message: string }> {
   if (!collectionId) {
     throw new Error("Collection ID is required");
@@ -14,7 +15,7 @@ export async function updateRecord(
     collection: collectionId,
     filter: filter,
     update: {
-      $set: updatedData,
+      [operator]: updatedData,
     },
   });
 
