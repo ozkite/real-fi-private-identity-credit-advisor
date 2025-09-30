@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import type { TLLMName } from "@/config/llm";
 import type { IChatMessage, IWebSearchSource } from "../types/chat";
 
@@ -101,6 +102,13 @@ export function useStreamingChat() {
             }
           }
         } finally {
+          const rateLimitReached = response.headers.get("X-Rate-Limit-Reached");
+          if (rateLimitReached === "true") {
+            toast.info(
+              "You have reached the daily limit for web search. Your prompt was routed to the model without web search.",
+              { duration: 8000 },
+            );
+          }
           reader.releaseLock();
         }
 
