@@ -60,6 +60,7 @@ const ChatInput: React.FC<IChatInputProps> = ({
       ]),
       new FileSizeValidator({ maxFileSize: 5 * 1024 * 1024 }), // 5MB
     ],
+    onFilesSuccessfullySelected: () => setIsWebSearchEnabled(false),
     onFilesRejected: ({ errors }) => {
       const isFileSizeError = errors.some(
         (error) => error.name === "FileSizeError",
@@ -181,6 +182,8 @@ const ChatInput: React.FC<IChatInputProps> = ({
 
   const areFilePickersLoading =
     isLoading || isLoadingImagePicker || isLoadingPdfPicker || !isAuthenticated;
+  const isWebSearchDisabled =
+    isLoading || !isAuthenticated || imageContent.length > 0;
 
   return (
     <div className="w-full">
@@ -281,17 +284,26 @@ const ChatInput: React.FC<IChatInputProps> = ({
             <div className="flex items-center gap-1">
               <Tooltip delayDuration={100}>
                 <TooltipTrigger>
-                  <div className="flex items-center gap-0.5">
-                    <label
-                      htmlFor="web-search-switch"
-                      className="cursor-pointer"
-                    >
-                      <TbWorldSearch size={18} />
+                  <div
+                    className={`flex items-center gap-0.5 ${
+                      isWebSearchDisabled ? "cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <label htmlFor="web-search-switch">
+                      <TbWorldSearch
+                        size={18}
+                        className={
+                          isWebSearchDisabled
+                            ? "cursor-not-allowed opacity-50"
+                            : "cursor-pointer"
+                        }
+                      />
                     </label>
                     <Switch
                       id="web-search-switch"
                       checked={isWebSearchEnabled}
                       onCheckedChange={setIsWebSearchEnabled}
+                      disabled={isWebSearchDisabled}
                     />
                   </div>
                 </TooltipTrigger>

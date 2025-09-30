@@ -524,7 +524,6 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 <ChatInput
                   onSendMessage={handleSendMessage}
                   isLoading={isLoading || isStreaming || isUpdatingChat}
-                  placeholder="What do you want to ask?"
                   showActionButtons={false}
                 />
               )}
@@ -589,7 +588,6 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                   <ChatInput
                     onSendMessage={handleSendMessage}
                     isLoading={isLoading || isStreaming || isUpdatingChat}
-                    placeholder="What do you want to ask?"
                     showActionButtons={false}
                   />
                 </div>
