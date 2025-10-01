@@ -11,6 +11,7 @@ export default function ContentPolicy() {
   const [isExpandedFirst, setIsExpandedFirst] = useState(false);
   const [isExpandedSecond, setIsExpandedSecond] = useState(false);
   const [isExpandedThird, setIsExpandedThird] = useState(false);
+  const [_isExpandedFourth, _setIsExpandedFourth] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -45,7 +46,133 @@ export default function ContentPolicy() {
 
           {/* Content */}
           <div className="prose prose-lg max-w-none space-y-8">
-            {/* Newest Article - nilGPT v4 */}
+            {/* Newest Article - nilGPT v5 */}
+            <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
+              <article className="space-y-8">
+                {/* Main Title */}
+                <h1 className="font-display font-black text-3xl lg:text-4xl text-navy-900 mb-6">
+                  nilGPT v5: Web Search & PDF Uploads
+                </h1>
+
+                {/* Date */}
+                <div className="text-navy-600 text-sm font-medium mb-8">
+                  October 1, 2025
+                </div>
+
+                {/* Introduction */}
+                <p className="text-navy-700 leading-relaxed mb-6">
+                  Another week, another release of nilGPT and another step
+                  toward building the most capable, private AI assistant on the
+                  market. We're keeping the pace high, shipping features that
+                  bring nilGPT closer to feature parity with state-of-the-art
+                  chatbots, while always staying true to our core value: privacy
+                  first.
+                </p>
+
+                {/* Expandable Content */}
+                <div
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                    isExpandedFirst ? "max-h-none" : "max-h-0"
+                  }`}
+                >
+                  <p className="text-navy-700 leading-relaxed mb-4">
+                    This release focuses on two major new capabilities: web
+                    search and PDF uploads.
+                  </p>
+
+                  {/* Major Features Section */}
+                  <section className="mb-8">
+                    <h2 className="font-display font-bold text-2xl text-navy-900 mb-4">
+                      Major Features
+                    </h2>
+
+                    <h3 className="font-display font-bold text-xl text-navy-900 mb-3">
+                      Web Search
+                    </h3>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      One of the most requested features has arrived. nilGPT now
+                      supports web search, made possible by a new capability
+                      recently introduced in nilAI. This capability is powered
+                      by Brave's API, chosen for its stronger privacy
+                      protections.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      By default, web search is turned off in nilGPT - you'll
+                      need to toggle it on to use it. When enabled, please be
+                      aware that sensitive query data may be visible to Brave
+                      servers. While nilAI's optimisation pipeline summarises
+                      queries before sending them, we cannot guarantee that all
+                      sensitive information is stripped away. We are in fact
+                      working on an "AI proxy" to remove or anonymise PII from
+                      queries which would increase the privacy of the websearch
+                      feature even more.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-6">
+                      For now, web search is limited to 20 queries per user per
+                      day as we refine performance and gather your feedback.
+                      Even in this early stage, it extends nilGPT's reach beyond
+                      its training data, pulling in fresh answers and
+                      information directly from the web.
+                    </p>
+
+                    <h3 className="font-display font-bold text-xl text-navy-900 mb-3">
+                      PDF Uploads
+                    </h3>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      We've also added support for secure PDF uploads, allowing
+                      you to drop in documents and query them directly in
+                      nilGPT.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-6">
+                      Initially this feature was designed to accelerate
+                      workflows for professionals who handle large volumes of
+                      text - from legal contracts to academic research. But it's
+                      just as valuable for everyday use cases, like quickly
+                      checking an employment agreement for key clauses you
+                      should pay close attention to. These are exactly the kinds
+                      of scenarios where truly private AI shows its worth,
+                      delivering both security and convenience.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed mb-6">
+                      As always, we have also fixed a number of bugs and
+                      introduced small quality-of-life improvements to keep the
+                      overall experience smooth.
+                    </p>
+                  </section>
+
+                  {/* Looking Ahead Section */}
+                  <section className="mb-8">
+                    <h2 className="font-display font-bold text-2xl text-navy-900 mb-4">
+                      Looking Ahead
+                    </h2>
+                    <p className="text-navy-700 leading-relaxed mb-4">
+                      We're excited about this release. It pushes nilGPT closer
+                      to the cutting edge while staying firmly grounded in our
+                      commitment to privacy. We're particularly interested to
+                      see how industry professionals adopt PDF analysis in their
+                      work, and we welcome community feedback as we continue to
+                      refine web search.
+                    </p>
+                    <p className="text-navy-700 leading-relaxed">
+                      We're shipping fast, and our vision remains clear: to make
+                      nilGPT the go-to private AI chatbot.
+                    </p>
+                  </section>
+                </div>
+
+                {/* Toggle Button */}
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setIsExpandedFirst(!isExpandedFirst)}
+                    className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
+                  >
+                    {isExpandedFirst ? "Show Less" : "Read More"}
+                  </button>
+                </div>
+              </article>
+            </div>
+
+            {/* Previous Article - nilGPT v4 */}
             <div className="bg-white border-4 border-navy-900 brutalist-shadow p-8 space-y-8">
               <article className="space-y-8">
                 {/* Main Title */}
@@ -71,7 +198,7 @@ export default function ContentPolicy() {
                 {/* Expandable Content */}
                 <div
                   className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                    isExpandedThird ? "max-h-none" : "max-h-0"
+                    isExpandedSecond ? "max-h-none" : "max-h-0"
                   }`}
                 >
                   <p className="text-navy-700 leading-relaxed mb-4">
@@ -183,10 +310,10 @@ export default function ContentPolicy() {
                 {/* Toggle Button */}
                 <div className="text-center mt-6">
                   <button
-                    onClick={() => setIsExpandedThird(!isExpandedThird)}
+                    onClick={() => setIsExpandedSecond(!isExpandedSecond)}
                     className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
                   >
-                    {isExpandedThird ? "Show Less" : "Read More"}
+                    {isExpandedSecond ? "Show Less" : "Read More"}
                   </button>
                 </div>
               </article>
@@ -476,7 +603,7 @@ export default function ContentPolicy() {
                 {/* Expandable Content - All remaining content */}
                 <div
                   className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                    isExpandedSecond ? "max-h-none" : "max-h-0"
+                    isExpandedThird ? "max-h-none" : "max-h-0"
                   }`}
                 >
                   {/* Remaining paragraphs from first section */}
@@ -933,10 +1060,10 @@ export default function ContentPolicy() {
                 {/* Toggle Button */}
                 <div className="text-center mt-6">
                   <button
-                    onClick={() => setIsExpandedSecond(!isExpandedSecond)}
+                    onClick={() => setIsExpandedThird(!isExpandedThird)}
                     className="bg-navy-900 text-cream-50 px-6 py-3 font-bold brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all duration-200 rounded-lg"
                   >
-                    {isExpandedSecond ? "Show Less" : "Read More"}
+                    {isExpandedThird ? "Show Less" : "Read More"}
                   </button>
                 </div>
               </article>

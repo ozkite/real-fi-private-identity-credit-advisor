@@ -124,12 +124,14 @@ export default function AuthModal({
             <div className="mb-6">
               <p className="text-sm text-gray-600">
                 By agreeing to sign up you are agreeing to the{" "}
-                <Link
-                  href="/terms-services"
+                <a
+                  href="https://nillion.notion.site/nilGPT-Terms-of-Service-2261827799b4805bb956e7dbb828310c"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-blue-600 underline hover:text-blue-800"
                 >
                   terms and services
-                </Link>{" "}
+                </a>{" "}
                 and{" "}
                 <Link
                   href="/privacy-policy"
