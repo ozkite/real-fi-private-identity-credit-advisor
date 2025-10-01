@@ -28,12 +28,14 @@ const Footer = () => (
             </p>
           </div>
           <div className="flex items-center text-sm gap-3 max-md:gap-2 max-md:text-xs">
-            <Link
-              href="/terms-services"
+            <a
+              href="https://nillion.notion.site/nilGPT-Terms-of-Service-2261827799b4805bb956e7dbb828310c"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors underline"
             >
               Terms of Service
-            </Link>
+            </a>
             <Link
               href="/privacy-policy"
               className="text-gray-400 hover:text-white transition-colors underline"
