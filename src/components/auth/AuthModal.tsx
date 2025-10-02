@@ -18,7 +18,7 @@ export default function AuthModal({
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [keepMePosted, setKeepMePosted] = useState(false);
-  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [_showEmailConfirmation, _setShowEmailConfirmation] = useState(false);
   const { signIn, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,35 +31,37 @@ export default function AuthModal({
         onClose();
       } else {
         await signUp(email, password, name, keepMePosted);
-        setShowEmailConfirmation(true);
+        // setShowEmailConfirmation(true);
+        onClose();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
 
-  if (showEmailConfirmation) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold mb-4">Check your email</h2>
-          <p className="text-gray-600 mb-6">
-            We&apos;ve sent a confirmation link to{" "}
-            <span className="font-medium">{email}</span>. Please check your
-            email to complete your registration.
-          </p>
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Disabled: Email confirmation modal
+  // if (showEmailConfirmation) {
+  //   return (
+  //     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  //       <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+  //         <h2 className="text-2xl font-bold mb-4">Check your email</h2>
+  //         <p className="text-gray-600 mb-6">
+  //           We&apos;ve sent a confirmation link to{" "}
+  //           <span className="font-medium">{email}</span>. Please check your
+  //           email to complete your registration.
+  //         </p>
+  //         <div className="flex justify-end">
+  //           <button
+  //             onClick={onClose}
+  //             className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
+  //           >
+  //             Close
+  //           </button>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
