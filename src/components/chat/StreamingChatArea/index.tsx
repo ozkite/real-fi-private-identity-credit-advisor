@@ -203,8 +203,10 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     order: number;
     attachments?: TMessageAttachment[];
     sources?: IWebSearchSource[];
+    web_search?: boolean;
   }) => {
-    const { chatId, role, content, order, attachments, sources } = message;
+    const { chatId, role, content, order, attachments, sources, web_search } =
+      message;
 
     if (!user) {
       console.error("No authenticated user found");
@@ -240,6 +242,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
           attachments,
           sources,
           ...(isPWA && { pwa: true }),
+          ...(web_search === true && { web_search: true }),
         }),
       });
 
@@ -379,7 +382,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
               return updated;
             });
           },
-          onComplete: async (finalContent, sources) => {
+          onComplete: async (finalContent, sources, webSearchUsed) => {
             // Ensure final content is set
             setMessages((prev) => {
               const updated = [...prev];
@@ -413,6 +416,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 content: finalContent,
                 order: 2,
                 sources,
+                web_search: webSearchUsed,
               });
 
               // Update chat title immediately after first back and forth
@@ -471,6 +475,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                         content: finalContent,
                         order: totalMessages,
                         sources,
+                        web_search: webSearchUsed,
                       })
                     : Promise.resolve(),
                 ]);

@@ -44,4 +44,5 @@ export interface MESSAGES_SCHEMA {
   token_count?: string;
   attachments?: TMessageAttachment[];
   pwa?: boolean;
+  web_search?: boolean;
 }
