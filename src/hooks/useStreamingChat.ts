@@ -7,7 +7,11 @@ export interface UseStreamingChatOptions {
   model?: TLLMName;
   shouldUseWebSearch?: boolean;
   onUpdate?: (content: string) => void;
-  onComplete?: (content: string, sources?: IWebSearchSource[]) => void;
+  onComplete?: (
+    content: string,
+    sources?: IWebSearchSource[],
+    webSearchUsed?: boolean,
+  ) => void;
   onError?: (error: string) => void;
 }
 
@@ -54,6 +58,7 @@ export function useStreamingChat() {
         const decoder = new TextDecoder();
         let accumulatedContent = "";
         let webSearchSources: IWebSearchSource[] = [];
+        let webSearchUsed = false;
 
         setIsLoading(false);
         setIsStreaming(true);
@@ -108,12 +113,16 @@ export function useStreamingChat() {
               "You have reached the daily limit for web search. Your prompt was routed to the model without web search.",
               { duration: 8000 },
             );
+            webSearchUsed = false; // Rate limit reached, web search was not used
+          } else {
+            // Web search was used if we requested it and didn't hit rate limit
+            webSearchUsed = !!shouldUseWebSearch;
           }
           reader.releaseLock();
         }
 
         setIsStreaming(false);
-        onComplete?.(accumulatedContent, webSearchSources);
+        onComplete?.(accumulatedContent, webSearchSources, webSearchUsed);
         return accumulatedContent;
       } catch (error) {
         setIsLoading(false);

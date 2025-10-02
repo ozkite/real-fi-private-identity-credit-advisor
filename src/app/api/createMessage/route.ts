@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       attachments,
       pwa,
       sources,
+      web_search,
     } = body;
 
     if (!chat_id || !role || !blindfoldContent || order === undefined) {
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
       pwa,
       ...(attachments?.length > 0 && { attachments }),
       ...(sources?.length > 0 && { sources }),
+      ...(web_search === true && { web_search: true }),
     };
 
     const builder = await setupClient();
