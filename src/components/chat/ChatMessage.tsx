@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import type React from "react";
 import { useState } from "react";
+import { TbCheck, TbCopy } from "react-icons/tb";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { IChatMessage } from "../../types/chat";
@@ -57,7 +57,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <>
       {message.attachments && message.attachments.length > 0 && (
-        <div className="flex gap-1 items-center !-mb-2 ml-auto w-fit">
+        <div className="flex gap-1 items-center ml-auto w-fit mb-1">
           <span className="text-neutral-500 text-xs">Attached</span>
           <div className="flex gap-1 items-center">
             {message.attachments.map((attachment) => {
@@ -71,7 +71,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           </div>
         </div>
       )}
-      <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
+      <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
         <div className={bubbleClasses}>
           <div className={markdownProseClasses}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -122,23 +122,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
           {!isUser &&
             (isStreaming ? (
-              <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse ml-1 align-text-bottom" />
+              <span className="inline-block w-2 h-4 bg-gray-400 animate-pulse align-text-bottom" />
             ) : (
               message.content && (
                 <div className="flex mt-2 space-x-2">
                   <button
                     onClick={() => copyToClipboard(message.content as string)}
-                    className="p-1 text-neutral-500 hover:text-neutral-700"
+                    className="text-neutral-500 hover:text-neutral-700"
                     title={isCopied ? "Copied!" : "Copy to clipboard"}
                   >
-                    <Image
-                      src={
-                        isCopied ? "/img/tick_icon.svg" : "/img/copy-icon.png"
-                      }
-                      width={12}
-                      height={12}
-                      alt={isCopied ? "copied" : "copy-icon"}
-                    />
+                    {isCopied ? <TbCheck size={16} /> : <TbCopy size={16} />}
                   </button>
                 </div>
               )

@@ -18,6 +18,7 @@ export interface UseStreamingChatOptions {
 export function useStreamingChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isSearchingWeb, setIsSearchingWeb] = useState(false);
 
   const sendMessage = useCallback(
     async (
@@ -30,6 +31,7 @@ export function useStreamingChat() {
 
       setIsLoading(true);
       setIsStreaming(false);
+      setIsSearchingWeb(!!shouldUseWebSearch);
 
       try {
         const response = await fetch("/api/chat", {
@@ -131,6 +133,8 @@ export function useStreamingChat() {
           error instanceof Error ? error.message : "Unknown error occurred";
         onError?.(errorMessage);
         throw error;
+      } finally {
+        setIsSearchingWeb(false);
       }
     },
     [],
@@ -140,5 +144,6 @@ export function useStreamingChat() {
     sendMessage,
     isLoading,
     isStreaming,
+    isSearchingWeb,
   };
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { RefreshCwIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { TbRefresh } from "react-icons/tb";
 import { DEFAULT_MODEL } from "@/config/llm";
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
@@ -28,7 +28,8 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
   const [isUpdatingChat, setIsUpdatingChat] = useState(false);
   const chatIdRef = useRef<string | null>(initialChatId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { sendMessage, isLoading, isStreaming } = useStreamingChat();
+  const { sendMessage, isLoading, isStreaming, isSearchingWeb } =
+    useStreamingChat();
   const { user } = useAuth();
   const { setHasMessages, selectedPersona } = useApp();
   const { encrypt, hasSecretKey } = useEncryption();
@@ -539,7 +540,7 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         <div className="flex flex-col h-full">
           <div className="flex flex-col-reverse flex-1 overflow-y-auto px-4 py-2 w-full">
             <div ref={messagesEndRef} />
-            <div className="max-w-4xl mx-auto space-y-3 w-full mb-auto">
+            <div className="max-w-4xl mx-auto w-full mb-auto">
               {messages.map((message, index) => {
                 const isLastMessage = index === messages.length - 1;
                 const isAssistantStreaming =
@@ -554,12 +555,18 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 );
               })}
 
-              {isLoading && !isStreaming && (
-                <RefreshCwIcon
-                  size={16}
-                  className="animate-spin text-neutral-600 mx-6 my-2"
-                />
-              )}
+              {isLoading &&
+                !isStreaming &&
+                (isSearchingWeb ? (
+                  <span className="text-neutral-600 text-sm animate-pulse ml-6">
+                    Searching the web...
+                  </span>
+                ) : (
+                  <TbRefresh
+                    size={16}
+                    className="animate-spin text-neutral-600 ml-6 -mt-5"
+                  />
+                ))}
             </div>
           </div>
           {!hasDecryptionFailures && (
