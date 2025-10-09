@@ -1,7 +1,7 @@
 "use client";
 
-import { RefreshCwIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { TbRefresh } from "react-icons/tb";
 import { DEFAULT_MODEL } from "@/config/llm";
 import { getPersonaById } from "@/config/personas";
 import { useApp } from "@/contexts/AppContext";
@@ -28,8 +28,8 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
   const [isUpdatingChat, setIsUpdatingChat] = useState(false);
   const chatIdRef = useRef<string | null>(initialChatId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const { sendMessage, isLoading, isStreaming } = useStreamingChat();
+  const { sendMessage, isLoading, isStreaming, isSearchingWeb } =
+    useStreamingChat();
   const { user } = useAuth();
   const { setHasMessages, selectedPersona } = useApp();
   const { encrypt, hasSecretKey } = useEncryption();
@@ -257,28 +257,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     }
   };
 
-  const scrollToBottom = useCallback(
-    (force = false) => {
-      if (chatContainerRef.current) {
-        const { scrollHeight, clientHeight, scrollTop } =
-          chatContainerRef.current;
-        const isScrolledNearBottom =
-          scrollHeight - scrollTop - clientHeight < 150;
-
-        if (force || isScrolledNearBottom || isStreaming) {
-          messagesEndRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-          });
-        }
-      }
-    },
-    [isStreaming],
-  );
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isStreaming, scrollToBottom]);
+  const scrollToBottom = () =>
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
 
   useEffect(() => {
     setHasMessages(messages.length > 0);
@@ -289,10 +272,8 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     // Only update if we don't have messages yet, or if initialMessages is different
     if (messages.length === 0 && initialMessages.length > 0) {
       setMessages(initialMessages);
-      // Scroll to bottom after initial messages are set
-      setTimeout(() => scrollToBottom(true), 100);
     }
-  }, [initialMessages, messages.length, scrollToBottom]);
+  }, [initialMessages, messages.length]);
 
   // Handle chat ID changes (when switching between chats)
   useEffect(() => {
@@ -302,13 +283,11 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
     }
   }, [initialChatId, chatId]);
 
-  // Scroll to bottom when chat ID changes and we have messages
   useEffect(() => {
-    if (chatId && messages.length > 0) {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => scrollToBottom(true), 150);
+    if (messages.length > 0 && messages.length !== initialMessages.length) {
+      scrollToBottom();
     }
-  }, [chatId, messages.length, scrollToBottom]);
+  }, [messages.length, initialMessages.length]);
 
   const handleSendMessage = async ({
     content,
@@ -356,8 +335,6 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         attachments: userMessageAttachments,
       },
     ]);
-
-    setTimeout(() => scrollToBottom(true), 100);
 
     const assistantMessage: IChatMessage = {
       role: "assistant",
@@ -561,11 +538,9 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         </div>
       ) : (
         <div className="flex flex-col h-full">
-          <div
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto px-4 py-2 space-y-3 min-h-0"
-          >
-            <div className="max-w-4xl mx-auto space-y-3">
+          <div className="flex flex-col-reverse flex-1 overflow-y-auto px-4 py-2 w-full">
+            <div ref={messagesEndRef} />
+            <div className="max-w-4xl mx-auto w-full mb-auto">
               {messages.map((message, index) => {
                 const isLastMessage = index === messages.length - 1;
                 const isAssistantStreaming =
@@ -580,14 +555,19 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
                 );
               })}
 
-              {isLoading && !isStreaming && (
-                <RefreshCwIcon
-                  size={16}
-                  className="animate-spin text-neutral-600 mx-6 my-2"
-                />
-              )}
+              {isLoading &&
+                !isStreaming &&
+                (isSearchingWeb ? (
+                  <span className="text-neutral-600 text-sm animate-pulse ml-6">
+                    Searching the web...
+                  </span>
+                ) : (
+                  <TbRefresh
+                    size={16}
+                    className="animate-spin text-neutral-600 ml-6 -mt-5"
+                  />
+                ))}
             </div>
-            <div ref={messagesEndRef} />
           </div>
           {!hasDecryptionFailures && (
             <div className="flex-shrink-0 p-2">

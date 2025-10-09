@@ -1,8 +1,8 @@
 import { ChevronDown, Loader2, PlusIcon } from "lucide-react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { TbCheck } from "react-icons/tb";
 import {
   HoverCard,
   HoverCardContent,
@@ -161,15 +161,7 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
                       {persona.description}
                     </div>
                   </div>
-                  {currentPersonaId === persona.id && (
-                    <Image
-                      src="/img/tick_icon.svg"
-                      alt="Selected"
-                      width={16}
-                      height={16}
-                      className="flex-shrink-0"
-                    />
-                  )}
+                  {currentPersonaId === persona.id && <TbCheck size={16} />}
                 </div>
               </button>
             ))}
