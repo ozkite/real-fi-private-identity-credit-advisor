@@ -316,15 +316,18 @@ const StreamingChatArea: React.FC<StreamingChatAreaProps> = ({
         { type: "text", text: content },
       ];
     }
-    if (attachmentData?.pdfTextContent) {
-      userMessageAttachments.push("pdf");
+    if (attachmentData?.pdfData?.extractedTextContent) {
       userMessage.content = [
         {
           type: "text",
-          text: `This text extracted from a PDF file. Always refer to this text as an attached PDF file, do not refer to this as "provided text". ${attachmentData.pdfTextContent}`,
+          text: `This text extracted from a PDF file. Always refer to this text as an attached PDF file, do not refer to this as "provided text". ${attachmentData.pdfData.extractedTextContent}`,
         },
         { type: "text", text: content },
       ];
+
+      if (attachmentData.pdfData.useAsAttachedFile) {
+        userMessageAttachments.push("pdf");
+      }
     }
 
     setMessages((prev) => [
