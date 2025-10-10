@@ -6,7 +6,10 @@ export interface ISendMessageParams {
   shouldUseWebSearch?: boolean;
   attachmentData?: {
     imageDataUrl?: string;
-    pdfTextContent?: string | null;
+    pdfData?: {
+      useAsAttachedFile?: boolean;
+      extractedTextContent?: string | null;
+    };
   };
 }
 

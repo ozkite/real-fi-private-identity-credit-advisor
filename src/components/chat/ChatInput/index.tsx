@@ -35,7 +35,9 @@ const ChatInput: React.FC<IChatInputProps> = ({
   const [input, setInput] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [wasLoading, setWasLoading] = useState(false);
-  const [pdfTextContent, setPdfTextContent] = useState<string | null>(null);
+  const [extractedPdfTextContent, setExtractedPdfTextContent] = useState<
+    string | null
+  >(null);
   const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
 
   const {
@@ -122,11 +124,11 @@ const ChatInput: React.FC<IChatInputProps> = ({
   useEffect(() => {
     if (pdfContent.length > 0) {
       getTextFromPdf(pdfContent[0].content)
-        .then((text) => setPdfTextContent(text))
+        .then((text) => setExtractedPdfTextContent(text))
         .catch((error) => {
           toast.error("Could not parse PDF, please try again");
           console.error("Error getting text from pdf:", error);
-          handleClearPickedPdf();
+          clearPickedPdf();
         });
     }
   }, [pdfContent]);
@@ -150,11 +152,6 @@ const ChatInput: React.FC<IChatInputProps> = ({
     });
   };
 
-  const handleClearPickedPdf = () => {
-    setPdfTextContent(null);
-    clearPickedPdf();
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading || !isAuthenticated || isOverLimit) return;
@@ -168,13 +165,16 @@ const ChatInput: React.FC<IChatInputProps> = ({
       shouldUseWebSearch: isWebSearchEnabled,
       attachmentData: {
         imageDataUrl: imageContent?.[0]?.content,
-        pdfTextContent,
+        pdfData: {
+          useAsAttachedFile: pdfContent.length > 0,
+          extractedTextContent: extractedPdfTextContent,
+        },
       },
     });
     setInput("");
     setIsWebSearchEnabled(false);
     clearPickedImage();
-    handleClearPickedPdf();
+    clearPickedPdf();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -212,12 +212,12 @@ const ChatInput: React.FC<IChatInputProps> = ({
               </button>
             </div>
           )}
-          {pdfTextContent && (
+          {pdfContent.length > 0 && extractedPdfTextContent && (
             <div className="mb-2 relative flex self-end w-fit">
               <TbFileTypePdf size={24} />
               <button
                 type="button"
-                onClick={handleClearPickedPdf}
+                onClick={clearPickedPdf}
                 className="outline-none p-0.5 cursor-pointer rounded-full bg-neutral-200 absolute -top-2 -right-2.5 items-center"
               >
                 <TbX size={12} />
