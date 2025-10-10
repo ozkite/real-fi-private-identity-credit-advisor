@@ -1,6 +1,7 @@
 import { CheckCircle, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import useDeployedMeasurementHash from "@/hooks/useDeployedMeasurementHash";
+import { useGpuAttestation } from "@/hooks/useGpuAttestation";
 import useNilCCMeasurementHash from "@/hooks/useNilCCMeasurementHash";
 import API_ENDPOINTS from "@/services/API/constants";
 import { LINKS } from "../constants";
@@ -17,6 +18,12 @@ const AttestationModal = () => {
   const { measurementHash, isLoading, getMeasurementHash } =
     useNilCCMeasurementHash();
   const { deployedMeasurementHash, version } = useDeployedMeasurementHash();
+  const {
+    gpuAttestation,
+    isLoading: isGpuLoading,
+    error: gpuError,
+    fetchGpuAttestation,
+  } = useGpuAttestation();
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
   const handleCopyHash = async (hash: string, type: string) => {
@@ -242,6 +249,93 @@ const AttestationModal = () => {
             </div>
           </div>
         )}
+
+        {/* Advanced Section Divider */}
+        <div className="relative my-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-[#f7f6f2] px-4 py-1 text-sm font-medium text-gray-500 uppercase tracking-wide">
+              Advanced
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900 max-sm:text-base">
+            C. nilAI GPU Attestation
+          </h3>
+
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600">
+                This is the GPU attestation token produced by{" "}
+                <strong>nilAI</strong> (JWT containing verified GPU claims). The
+                token is cryptographically signed by NVIDIA's Remote Attestation
+                Service (NRAS). You can independently verify its authenticity
+                using NVIDIA's attestation tools and documentation:{" "}
+                <a
+                  href="https://docs.nvidia.com/attestation/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  https://docs.nvidia.com/attestation/
+                </a>
+              </p>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  onClick={() => fetchGpuAttestation()}
+                  disabled={isGpuLoading}
+                  size="sm"
+                  className="flex items-center gap-2"
+                  data-umami-event="Fetch GPU Attestation Clicked"
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 ${isGpuLoading ? "animate-spin" : ""}`}
+                  />
+                  Fetch
+                </Button>
+              </div>
+
+              {gpuError && (
+                <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">
+                  Error: {gpuError}
+                </div>
+              )}
+
+              {gpuAttestation && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    GPU Attestation Token:
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={gpuAttestation}
+                      readOnly
+                      className="flex-1 px-3 py-2 text-sm bg-white border border-gray-300 rounded-md font-mono text-xs"
+                      placeholder="GPU attestation token will appear here..."
+                    />
+                    <Button
+                      onClick={() =>
+                        handleCopyHash(gpuAttestation, "gpu-attestation")
+                      }
+                      size="sm"
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <Copy className="w-4 h-4" />
+                      {copiedHash === "gpu-attestation" ? "Copied!" : "Copy"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </DialogContent>
   );
